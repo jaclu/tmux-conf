@@ -5,7 +5,7 @@ tends to be error prone and rather complex, so therefore support for
 normal scripts is implemented. Either embeded or stored in separate
 files.
 
-src/tmux_conf/embedded_scripts.py handles scripting
+[src/tmux_conf/embedded_scripts.py](https://github.com/jaclu/tmux-conf/blob/main/src/tmux_conf/embedded_scripts.py) handles scripting
 
 ## Defining scripts
 
@@ -66,7 +66,7 @@ if they are deleted, but either is valid so entirely up to you.
 
 ## Bash
 
-Default is to generate /bin/sh style POSIX scripts. If bash functionality
+Default is to assume /bin/sh style POSIX scripts. If bash functionality
 is needed, self.es.create() has an optional param use_bash that can be
 set to True
 
