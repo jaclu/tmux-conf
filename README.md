@@ -114,7 +114,7 @@ There are some slight differences to what actually works with tmate
 compared to tmux 2.4, the stated compatibility level, tmux-conf handles
 those cases.
 
-Tpm is not supported by tmate, so unless plugin_handler has been
+Tpm is not compatible with tmate, so unless plugin_handler has been
 disabled, it is switched to 'manual'. This works fine in combination
 with tmate, including auto-install of plugins.
 
