@@ -30,6 +30,12 @@ version of tmux to display a message like "Popup scratchpad session
 needs 3.2". So that I never have to wonder why nothing happened if I
 attempt something not supported on that system.
 
+## Availability
+
+Primarilly using `pip install tmux-conf`
+
+Obviously you can clone this, but this is more for information than as a primary direct usage
+
 ## Suggested aproach
 
 Drop your current tmux.conf inside a content() method, wrapping stuff
