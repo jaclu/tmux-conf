@@ -84,21 +84,23 @@ bind -N 'Toggle mouse on/off'  M  run "cut -c3- ~/.tmux.conf | /usr/local/bin/ba
 For external scripts, the appropriate shebang defining what shell to use
 will be set.
 
-## Back ticks
+## Backticks
 
 The main thing to be aware of is that if embedded scripts are used,
-some considerations about handling back ticks must be made.
+some considerations about handling backticks must be made.
 
-Any un-escaped back ticks in the conf file will cause embedded scripts to
-fail. This is the case both for tmux assignments and comments.
+Any un-escaped backticks in the conf file will cause embedded scripts to
+fail. This is the case both for tmux code and comments.
 
-Any bind using a back tick must use \\\` notation in the final conf file.
+Any backtick must use \\\` notation in the final conf file.
 Not "\`" or '\`' otherwise the embedded script will fail to run,
 reporting an error.
 
 This means you have to double escape it in your Python code to ensure
-the resulting tmux conf code is escaped.
+the resulting tmux conf code is correctly escaped.
 
-Probably the simplest thing to do is to just avoid using back ticks.
+Probably the simplest thing to do is to just avoid using backticks. 
+The number of attempts it took me to write this before I got all the escaping to 
+generate the intended code was pure pain.
 
-For external scripts there is no back tick issue.
+For external scripts there is no backtick issue with the tmux.conf file
