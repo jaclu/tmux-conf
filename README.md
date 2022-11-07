@@ -53,6 +53,8 @@ methods. Thus they will also be version checked.
 - If tpm is used it will be installed if not present on startup.
 - All version compatible plugins are installed on startup, regrdless
   if tpm or manual plugin handling is used.
+- Check if the current tmux matches a version limit with vers_ok()
+  to decide if something should be included.
 - Conf file defines $TMUX_BIN, pointing to the actual tmux/tmate bin
   used to run this environment, and can be used in scripts and plugins
   to use the right binary.
