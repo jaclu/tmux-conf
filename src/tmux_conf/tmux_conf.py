@@ -127,7 +127,7 @@ class TmuxConfig:
                 replace_config = True
 
             if self.plugin_handler:
-                #  tmate only suports manual plugin handling
+                #  tmate only supports manual plugin handling
                 self.plugin_handler = "manual"
 
         self.e_c_has_been_called = False
