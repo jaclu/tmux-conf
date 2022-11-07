@@ -163,12 +163,12 @@ A few very limited systems have more resource heavy standard plugins
 disabled automatically.
 
 The end result is that I have one single tmux config I use on all
-systems.
+systems. You can check it out at https://github.com/jaclu/my_tmux_conf
 I don't have to think about what version of tmux is available, my
 config takes care of adopting. When I start using a feature from a
 new version of tmux, I can just put it in my standard config with a
 version check preventing it from being used on older tmuxes.
-As that version gets adopted the new feature automatically becomes more
+As versions gets updated the new feature automatically becomes more
 widely available.
 
 ## Version references
