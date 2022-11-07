@@ -2,7 +2,7 @@
 
 In principle full scripting can be embedded using tmux statements, but it
 tends to be error prone and rather complex, so therefore support for
-normal scripts is implemented. Either embeded or stored in separate
+normal scripts is included. Either embeded or stored in separate
 files.
 
 [src/tmux_conf/embedded_scripts.py](https://github.com/jaclu/tmux-conf/blob/main/src/tmux_conf/embedded_scripts.py) handles scripting
