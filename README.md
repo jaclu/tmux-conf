@@ -16,7 +16,7 @@ If any plugins are defined they will be auto-installed on first run.
 
 This in combination with hostname matching makes it easy to adopt a
 given environment based both on tmux version available, and what
-features are meaningful on that host. Managing a music player is
+features are relevant for that host. Managing a music player is
 probably not all that meaningful on a remote cloud host :)
 
 The generation of a tmux.conf takes only a fraction of a second, so I
