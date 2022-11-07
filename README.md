@@ -124,6 +124,9 @@ all references to tmux in the scripts of the plugin to instead use
 $TMUX_BIN, this way it inherits what tmux bin to use (in this case tmate)
 from the environment.
 
+Even with that fix, sometimes they simply dont work under tmate, 
+even if they are suposed to be 2.4 compatible, so it is a bit hit-and-miss.
+
 All that is needed to make the plugin usable without tmux-conf, is to add 
 this code snippet in the common script used to set up the environment, 
 often called `scripts/helpers.sh`, so that $TMUX_BIN is set in case 
@@ -141,10 +144,12 @@ this plugin is used without a tmux-conf generated config.
 [ -z "$TMUX_BIN" ] && TMUX_BIN="tmux"
 ```
 
-I have adopted a few to be tmate compatible.
+Here are some plugins that work with tmate, in some cases I have adopted 
+them, with TMUX_BIN notation, then listing my fork.
 
 plugin | fork
 -|-
+jaclu/tmux-keyboard-type|
 tmux-better-mouse-mode | jaclu/tmux-better-mouse-mode
 tmux-prefix-highlight  | jaclu/tmux-prefix-highlight
 
