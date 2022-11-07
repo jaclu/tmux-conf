@@ -47,7 +47,8 @@ class Plugins:
 
         self._is_limited_host = False
 
-        self._used_plugins: dict[str, tuple[str, Callable[[], list[str]], str]] = {}
+        self._used_plugins: dict[str,
+                                 tuple[str, Callable[[], list[str]], str]] = {}
         # self._used_plugins: dict[
         #     str, tuple[str, Callable[[], tuple[str, str, str]], str]
         # ] = {}  # plugins that will be used
@@ -70,9 +71,17 @@ class Plugins:
             #
             self.clear()
 
-    def found(self):
+    def found(self, short_name=True):
         """Returns a list of plugin names being used."""
-        return self._used_plugins.keys()
+        result = []
+        for full_name in self._used_plugins.keys():
+            name = full_name
+            if short_name:
+                # Try to return only actual plugin name, without provider
+                if full_name.find('/') > -1:
+                    name = full_name.split('/')[1]
+            result.append(name)
+        return result
 
     def get_deploy_dir(self) -> str:
         """Returns dir where plugins will be installed."""
@@ -211,7 +220,8 @@ class Plugins:
             #  plugin and install if missing
             #
             output.append(self.mkscript_manual_deploy())
-            output.append(self._es.run_it(self._fnc_activate_manually, in_bg=True))
+            output.append(self._es.run_it(
+                self._fnc_activate_manually, in_bg=True))
         elif self._plugin_handler:
             #
             #  For any other _plugin_handler setting, assume it is tpm
