@@ -8,7 +8,7 @@ that features not working on a given version can be handled gracefully.
 Either replaced by something suitable for that version, or just skipped.
 
 This gets rid of annoying startup error messages for features not being
-available on the running version.
+available on the running version and failure to parse the rest of the config.
 
 The optional [plugin](docs/PLUGINS.md) handling is also automated in the
 sense that plugins not usable on the given version of tmux are skipped.
