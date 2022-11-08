@@ -1,7 +1,8 @@
+from common_vars import CONF_FILE
+
 from tmux_conf.embedded_scripts import EmbeddedScripts
 
 SCRIPT_NAME = "foo123"
-CONF_FILE = "~/.tmux.conf"
 
 
 def es_env(conf_file=CONF_FILE, use_embedded_scripts=True):
