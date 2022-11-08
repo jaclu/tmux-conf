@@ -79,7 +79,7 @@ class Plugins:
         Since if a different fork of it is being used, the name would
         not match."""
         result = []
-        for full_name in self._used_plugins.keys():
+        for full_name in self._used_plugins:
             name = full_name
             if short_name:
                 # Try to return only actual plugin name, without provider
