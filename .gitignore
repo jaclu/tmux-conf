@@ -6,4 +6,5 @@ __pycache__/
 .tool-versions
 dist/
 src/tmux_conf.egg-info/
+settings.json
 *.code-workspace
