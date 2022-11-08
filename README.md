@@ -98,7 +98,7 @@ status bar.
     if "tmux-prefix-highlight" in used_plugins:
         sb_right += "#{prefix_highlight}"
 
-    w(f"set -g  status-right "{sb_right}")
+    w(f"set -g  status-right '{sb_right}'")
 
 ```
 
