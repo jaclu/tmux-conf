@@ -10,6 +10,8 @@ PLUGIN_NAME = "tmux-prefix-highlight"
 
 
 class PluginsSample(TmuxConfig):
+    """Test class ensuring plugins are only present at the intended
+    versions"""
     def content(self):
         self.write("# dummy content")
 
@@ -28,6 +30,8 @@ class PluginsSample(TmuxConfig):
 
 
 class PluginsDisabled(PluginsSample):
+    """Test class ensuring no plugins show up if plugin_handler is
+    disabled"""
     plugin_handler = ""
 
 
