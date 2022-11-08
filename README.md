@@ -92,10 +92,10 @@ status bar.
     w = self.write
     used_plugins = self.plugins.found()
 
-    if "jaclu/tmux-packet-loss" in used_plugins:
+    if "tmux-packet-loss" in used_plugins:
         sb_right = "#{packet_loss}" + sb_right
 
-    if "tmux-plugins/tmux-prefix-highlight" in used_plugins:
+    if "tmux-prefix-highlight" in used_plugins:
         sb_right += "#{prefix_highlight}"
 
     w(f"set -g  status-right "{sb_right}")
@@ -189,7 +189,7 @@ See [docs/scripting.md](docs/scripting.md) for more info.
 ## Tmate
 
 This generates valid tmate configs, so by selecting tmate as the
-desired binary by using `-t tmate`, you can generate a tmate compatible 
+desired binary by using `-t tmate`, you can generate a tmate compatible
 config directly from your standard config.
 This will assume version 2.4 for version checks and save the config to `~/.tmate.conf`
 if no config file was specified on the command line.
@@ -202,18 +202,18 @@ Tpm is not compatible with tmate, so unless plugin_handler has been
 disabled, it is switched to 'manual'. This works fine in combination
 with tmate, including auto-install of plugins.
 
-Be aware that most tmux plugins are not directly tmate compatible. 
-They tend to blindly run tmux. To fix that is pretty simple, replace 
-all references to tmux in the scripts of the plugin to instead use 
+Be aware that most tmux plugins are not directly tmate compatible.
+They tend to blindly run tmux. To fix that is pretty simple, replace
+all references to tmux in the scripts of the plugin to instead use
 $TMUX_BIN, this way it inherits what tmux bin to use (in this case tmate)
 from the environment.
 
-Even with that fix, sometimes they simply dont work under tmate, 
+Even with that fix, sometimes they simply dont work under tmate,
 even if they are suposed to be 2.4 compatible, so it is a bit hit-and-miss.
 
-All that is needed to make the plugin usable without tmux-conf, is to add 
-this code snippet in the common script used to set up the environment, 
-often called `scripts/helpers.sh`, so that $TMUX_BIN is set in case 
+All that is needed to make the plugin usable without tmux-conf, is to add
+this code snippet in the common script used to set up the environment,
+often called `scripts/helpers.sh`, so that $TMUX_BIN is set in case
 this plugin is used without a tmux-conf generated config.
 
 ```
@@ -228,7 +228,7 @@ this plugin is used without a tmux-conf generated config.
 [ -z "$TMUX_BIN" ] && TMUX_BIN="tmux"
 ```
 
-Here are some plugins that work with tmate, in some cases I have adopted 
+Here are some plugins that work with tmate, in some cases I have adopted
 them, with TMUX_BIN notation, then listing my fork.
 
 plugin | fork

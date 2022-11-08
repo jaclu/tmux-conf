@@ -286,7 +286,7 @@ class Plugins:
         )
         plugins_dir, _ = self.get_env()
         plugins = ""
-        for p in self.found():
+        for p in self.found(short_name=False):
             plugins += " " + p
 
         activate_manually_sh = [
