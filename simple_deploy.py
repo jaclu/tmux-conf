@@ -29,7 +29,7 @@ a.reverse()
 SP = "site-packages"
 
 for p in sys.path:
-    if p.find(os.getenv("HOME")) < 0:
+    if p.find(os.getenv("HOME") or "") < 0:
         continue
     if len(p) - len(SP) == p.rfind(SP):
         # chdir to this location to make relative paths work
