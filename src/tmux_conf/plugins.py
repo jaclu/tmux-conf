@@ -274,6 +274,10 @@ class Plugins:
         return plugins_dir, tpm_env
 
     def mkscript_manual_deploy(self) -> list[str]:
+        """This script is run as tmux starts, all non-present
+        plugins are installed, and an attempt is done to initialize
+        each plugin.
+        """
         output = []
         output.append(
             """
@@ -306,13 +310,10 @@ class Plugins:
             git clone "https://github.com/$plugin" "{plugins_dir}/$name"
         fi
         init_script="$(find "{plugins_dir}/$name" -maxdepth 1 | grep tmux$ | head -n 1)"
-        if [[ -z "$init_script" ]]; then
-            echo "ERROR: Could not find $name init script"
-            exit 1
+        if [[ -n "$init_script" ]]; then
+            $TMUX_BIN display "running: $init_script"
+            $init_script || echo "ERROR in $init_script"
         fi
-        $TMUX_BIN display "running: $init_script"
-        #  run init script
-        $init_script || echo "ERROR in $init_script"
     done
 }}""",
         ]
@@ -322,6 +323,10 @@ class Plugins:
         return output
 
     def mkscript_tpm_deploy(self) -> list[str]:
+        """If tpm is present, it is started.
+        If not, it is installed and requested to install all
+        defined plugins.
+        """
         output = []
         output.append(
             """
@@ -384,7 +389,7 @@ class Plugins:
     fi
 
     #
-    #  this only triggers plugins install if tpm needed to be instaled.
+    #  this only triggers plugins install if tpm needed to be installed.
     #  Otherwise installing missing plugins is delegated to tpm.
     #  Default trigger is: <prefix> I
     #
