@@ -1,7 +1,10 @@
 *~
 *#
+.DS_STORE
 .coverage
 __pycache__/
 .tool-versions
 dist/
 src/tmux_conf.egg-info/
+settings.json
+*.code-workspace

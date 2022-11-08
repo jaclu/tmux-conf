@@ -98,7 +98,7 @@ status bar.
     if "tmux-prefix-highlight" in used_plugins:
         sb_right += "#{prefix_highlight}"
 
-    w(f"set -g  status-right "{sb_right}")
+    w(f"set -g  status-right '{sb_right}'")
 
 ```
 
@@ -119,7 +119,8 @@ A few very limited systems have more resource heavy standard plugins
 disabled automatically.
 
 The end result is that I have one single tmux config I use on all
-systems. You can check it out at https://github.com/jaclu/my_tmux_conf
+systems. You can check it out at
+[jaclu/my_tmux_conf](https://github.com/jaclu/my_tmux_conf)
 I don't have to think about what version of tmux is available, my
 config takes care of adopting. When I start using a feature from a
 new version of tmux, I can just put it in my standard config with a
@@ -127,14 +128,14 @@ version check preventing it from being used on older tmuxes.
 As versions gets updated the new feature automatically becomes more
 widely available.
 
-## Version references
+## Version checks
 
-Param for calls to vers_ok() is lazy, can be either int, float or
-string. In most cases a float is sufficient, like 3.0
+Param for calls to vers_ok() is flexible, can be either int, float or
+string. In most cases a float is sufficient, like 2.8
 
 Since some versions include a trailing letter, like 3.3a, then a string
-param would be needed. If version is given as int, it will be converted
-into a float ending in .0
+param would be needed. If version is given as int, it will be appended
+with .0
 
 ## Example snippets
 
@@ -185,55 +186,3 @@ Such scripts can either be saved as embedded in the tmux conf file or
 as external files in scripts/ next to plugins/
 
 See [docs/scripting.md](docs/scripting.md) for more info.
-
-## Tmate
-
-This generates valid tmate configs, so by selecting tmate as the
-desired binary by using `-t tmate`, you can generate a tmate compatible
-config directly from your standard config.
-This will assume version 2.4 for version checks and save the config to `~/.tmate.conf`
-if no config file was specified on the command line.
-
-There are some slight differences to what actually works with tmate
-compared to tmux 2.4, the stated compatibility level, tmux-conf handles
-those cases.
-
-Tpm is not compatible with tmate, so unless plugin_handler has been
-disabled, it is switched to 'manual'. This works fine in combination
-with tmate, including auto-install of plugins.
-
-Be aware that most tmux plugins are not directly tmate compatible.
-They tend to blindly run tmux. To fix that is pretty simple, replace
-all references to tmux in the scripts of the plugin to instead use
-$TMUX_BIN, this way it inherits what tmux bin to use (in this case tmate)
-from the environment.
-
-Even with that fix, sometimes they simply dont work under tmate,
-even if they are suposed to be 2.4 compatible, so it is a bit hit-and-miss.
-
-All that is needed to make the plugin usable without tmux-conf, is to add
-this code snippet in the common script used to set up the environment,
-often called `scripts/helpers.sh`, so that $TMUX_BIN is set in case
-this plugin is used without a tmux-conf generated config.
-
-```
-#
-#  I use an env var TMUX_BIN to point at the used tmux, defined in my
-#  tmux.conf, in order to pick the version matching the server running,
-#  or when the tmux bin is in fact tmate :)
-#  If not found, it is set to whatever is in PATH, so should have no negative
-#  impact. In all calls to tmux I use $TMUX_BIN instead in the rest of this
-#  plugin.
-#
-[ -z "$TMUX_BIN" ] && TMUX_BIN="tmux"
-```
-
-Here are some plugins that work with tmate, in some cases I have adopted
-them, with TMUX_BIN notation, then listing my fork.
-
-plugin | fork
--|-
-jaclu/tmux-keyboard-type|
-NHDaly/tmux-better-mouse-mode | jaclu/tmux-better-mouse-mode
-tmux-plugins/tmux-prefix-highlight  | jaclu/tmux-prefix-highlight
-
