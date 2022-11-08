@@ -237,6 +237,6 @@ them, with TMUX_BIN notation, then listing my fork.
 plugin | fork
 -|-
 jaclu/tmux-keyboard-type|
-tmux-better-mouse-mode | jaclu/tmux-better-mouse-mode
-tmux-prefix-highlight  | jaclu/tmux-prefix-highlight
+NHDaly/tmux-better-mouse-mode | jaclu/tmux-better-mouse-mode
+tmux-plugins/tmux-prefix-highlight  | jaclu/tmux-prefix-highlight
 
