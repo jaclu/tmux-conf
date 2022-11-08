@@ -72,7 +72,12 @@ class Plugins:
             self.clear()
 
     def found(self, short_name=True):
-        """Returns a list of plugin names being used."""
+        """Returns a list of plugin names being used.
+        If short_name is False will return the full name including
+        source, this is needed when cloning the repo, but less desired
+        when just checking if a given plugin is used in most cases.
+        Since if a different fork of it is being used, the name would
+        not match."""
         result = []
         for full_name in self._used_plugins.keys():
             name = full_name
@@ -95,10 +100,18 @@ class Plugins:
     # ================================================================
 
     def set_limited_host(self, is_limited: bool) -> bool:
+        """For this module, this indicates that the host is considered
+        slowish, so extended status updates should be provided during
+        plugin init, to help indicating when all the plugins are setup.
+        Om normalish system, this is close to instantaneous, so step by
+        step progress is not really meaningful.
+        """
         self._is_limited_host = is_limited
         return self._is_limited_host
 
     def scan(self, plugin_methods: list[Callable[[], list[str]]]) -> None:
+        """Investigate all defined plugin methods, and determine if a
+        given plugin can be used depending on running tmux"""
         duplicate_check: list[str] = []
         for plugin_mthd in plugin_methods:
             plugin_name, vers_min, code = plugin_mthd()
@@ -119,6 +132,7 @@ class Plugins:
         self._skipped_plugins.sort()
 
     def display_info(self):
+        """List selected and ignored plugins, depending on param"""
         print(f"\n\t=====  tmux {self._vers.get()} - Plugins defined  =====")
         print(f" for: {__main__.__file__}")
 
@@ -274,6 +288,10 @@ class Plugins:
         return plugins_dir, tpm_env
 
     def mkscript_manual_deploy(self) -> list[str]:
+        """This script is run as tmux starts, all non-present
+        plugins are installed, and an attempt is done to initialize
+        each plugin.
+        """
         output = []
         output.append(
             """
@@ -306,13 +324,10 @@ class Plugins:
             git clone "https://github.com/$plugin" "{plugins_dir}/$name"
         fi
         init_script="$(find "{plugins_dir}/$name" -maxdepth 1 | grep tmux$ | head -n 1)"
-        if [[ -z "$init_script" ]]; then
-            echo "ERROR: Could not find $name init script"
-            exit 1
+        if [[ -n "$init_script" ]]; then
+            $TMUX_BIN display "running: $init_script"
+            $init_script || echo "ERROR in $init_script"
         fi
-        $TMUX_BIN display "running: $init_script"
-        #  run init script
-        $init_script || echo "ERROR in $init_script"
     done
 }}""",
         ]
@@ -322,6 +337,10 @@ class Plugins:
         return output
 
     def mkscript_tpm_deploy(self) -> list[str]:
+        """If tpm is present, it is started.
+        If not, it is installed and requested to install all
+        defined plugins.
+        """
         output = []
         output.append(
             """
@@ -384,7 +403,7 @@ class Plugins:
     fi
 
     #
-    #  this only triggers plugins install if tpm needed to be instaled.
+    #  this only triggers plugins install if tpm needed to be installed.
     #  Otherwise installing missing plugins is delegated to tpm.
     #  Default trigger is: <prefix> I
     #
@@ -402,10 +421,9 @@ class Plugins:
         return output
 
     def clear(self):
-        #
-        #  to minimize some bug causing massive file deletion,
-        #  file path is double checked.
-        #
+        """ To minimize risk of some bug causing massive file deletion,
+        file path is double checked.
+        """
         plugins_dir = self.get_deploy_dir()
 
         b_suspicious = False
