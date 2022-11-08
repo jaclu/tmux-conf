@@ -14,7 +14,7 @@
 
 
 class VersionCheck:
-    def __init__(self, actual_vers, requested_vers = None):
+    def __init__(self, actual_vers, requested_vers=None):
         self._vers_actual = self.normalize_vers(actual_vers)
         if requested_vers:
             self._vers = self.normalize_vers(requested_vers)
@@ -49,6 +49,12 @@ class VersionCheck:
 
     def is_ok(self, vers) -> bool:
         """Checks version vs current tmux environment
+        Param is forgiving, can be int, float or string.
+        When given as int .0 is appended
+        In many cases a float is sufficient, like 2.8, 3.0 etc
+        Some versions have character suffixes like 3.3a, then a string
+        param is needed. Internally version refs are allways treated as
+        strings.
         """
         v = self.normalize_vers(vers)
         try:
@@ -99,4 +105,3 @@ class VersionCheck:
         #  correct , -> .
         vers = vers.replace(",", ".")
         return vers
-
