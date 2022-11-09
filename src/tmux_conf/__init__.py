@@ -6,4 +6,4 @@
 #  Part of https://github.com/jaclu/tmux-conf
 #
 
-from .tmux_conf import TmuxConfig
+from .tmux_conf import TmuxConfig  # noqa: F401

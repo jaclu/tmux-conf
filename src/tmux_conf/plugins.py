@@ -15,6 +15,7 @@ import os
 import shutil
 import sys
 from collections.abc import Callable
+from typing import Union
 
 import __main__
 
@@ -186,7 +187,7 @@ class Plugins:
 
         sys.exit(1)
 
-    def parse(self) -> list[str]:
+    def parse(self) -> list[Union[str, list[str]]]:
         """This package will use any plugin defining methods it can find.
         They will be sorted alphabetically by method name, normally the order
         of plugins do not matter, but if you do want to force the sorting,
@@ -208,7 +209,7 @@ class Plugins:
         if not (self._used_plugins):
             return []
 
-        output: list = []
+        output: list[Union[str, list[str]]] = []
 
         #
         #  First ensure that plugin code that needs to process the
