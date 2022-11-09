@@ -152,8 +152,6 @@ class EmbeddedScripts:
             scripts_dir = os.path.expanduser("~/.tmux/scripts")
         else:
             conf_file = os.path.expanduser(self._conf_file)
-            if conf_file[0] != "/":  # TODO: Not windows compatible
-                conf_file = os.path.join(os.getcwd(), conf_file)
 
             xdg_home = os.environ.get(XDG_CONFIG_HOME)
             # pylint: disable=consider-using-assignment-expr
