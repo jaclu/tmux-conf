@@ -1,4 +1,5 @@
 import os
+
 import pytest
 
 from src.tmux_conf.tmux_conf import TmuxConfig
@@ -54,8 +55,14 @@ class PluginsDisabled(PluginsSample):
     plugin_handler = ""
 
 
-class PluginsDuplicated(PluginsSample):
+class PluginsManual(PluginsSample):
+    """Test class ensuring no plugins show up if plugin_handler is
+    disabled"""
 
+    plugin_handler = "manual"
+
+
+class PluginsDuplicated(PluginsSample):
     def plugin_prefix_highlight2(self):
         #
         #  Highlights when you press tmux prefix key and
@@ -76,8 +83,8 @@ def prep_plugin_class(cls, version=2.8):
     return ps
 
 
-def tc_env():
-    tc = TmuxConfig(parse_cmd_line=False, conf_file=CONF_FILE)
+def tc_env(conf_file=CONF_FILE):
+    tc = TmuxConfig(parse_cmd_line=False, conf_file=conf_file)
     return tc
 
 
@@ -114,6 +121,26 @@ def test_tc_is_tmate():
         return  # Can't do this test
     tc.use_tmux_bin(tmate_cmd)
     assert tc.is_tmate() is True
+
+
+def not_tc_tmate_get_env():
+    tc = tc_env(conf_file="~/.tmate.conf")
+    #  This assumes there is a tmate in PATH
+    if not (tmate_cmd := run_shell("command -v tmate")):
+        return  # Can't do this test
+    tc.use_tmux_bin(tmate_cmd)
+    plugins_dir, _ = tc.plugins.get_env()
+    assert plugins_dir == f"{os.getenv('HOME')}/.tmate/plugins"
+
+
+def test_tc_tmate_get_env():
+    tc = tc_env(conf_file="~/.tmate.conf")
+    #  This assumes there is a tmate in PATH
+    if not (tmate_cmd := run_shell("command -v tmate")):
+        return  # Can't do this test
+    tc.use_tmux_bin(tmate_cmd)
+    plugins_dir, _ = tc.plugins.get_env()
+    assert plugins_dir == f"{os.getenv('HOME')}/.tmate/plugins"
 
 
 def test_tc_filter_note():
@@ -193,8 +220,7 @@ def test_tc_conf_file_header_and_content():
 def test_tc_plugin_found():
     ps = prep_plugin_class(cls=PluginsSample, version=2.4)
     assert ps.plugins.found() == [PLUGIN_NAME]
-    assert ps.plugins.found(short_name=False) == [
-        f"{PLUGIN_SOURCE}/{PLUGIN_NAME}"]
+    assert ps.plugins.found(short_name=False) == [f"{PLUGIN_SOURCE}/{PLUGIN_NAME}"]
 
 
 def test_tc_plugin_unavailable():
@@ -211,12 +237,13 @@ def test_tc_plugins_disabled():
 
 def test_tc_plugin_duplicate():
     with pytest.raises(SystemExit):
-        ps = prep_plugin_class(cls=PluginsDuplicated, version=2.4)
+        prep_plugin_class(cls=PluginsDuplicated, version=2.4)
 
 
 #
 #  Checks that only plugins of matching version are selected
 #
+
 
 @pytest.mark.parametrize(
     "vers, plugins_expected",
@@ -228,7 +255,8 @@ def test_tc_plugin_duplicate():
 )
 def test_tc_plugins_display_info(vers, plugins_expected, capsys):
     ps = prep_plugin_class(cls=PluginsSample, version=vers)
-    # to test both verbose and not for plugin display...
+    #  to test both verbose and not for plugin display in order to
+    #  increase coverage
     if plugins_expected == 2:
         ps.plugins._plugins_display = 3
     elif plugins_expected == 1:
@@ -240,12 +268,32 @@ def test_tc_plugins_display_info(vers, plugins_expected, capsys):
         #  this forces continuation
         pass
     captured = capsys.readouterr()
-    do_count = True
+    do_count = False
     plugins_found = 0
-    for l in captured.out.split('\n'):
-        if do_count and l and l[0] == ">":
-            print(l)
+    for line in captured.out.split("\n"):
+        print(line)
+        if line.find("Plugins ignored") > -1:
+            #  Stop counting when ignored list starts
+            do_count = False
+        if do_count and line.find(" - ") > -1:
             plugins_found += 1
-        if l.find('|  Min') > -1:
+        if line.find("|  Min") > -1:
+            #  Start counting after header before used plugins
             do_count = True
     assert plugins_found == plugins_expected
+
+
+@pytest.mark.parametrize(
+    "plugin_cls",
+    [
+        (PluginsSample),
+        (PluginsManual),
+    ],
+)
+def test_tc_plugins_parse(plugin_cls, capsys):
+    ps = prep_plugin_class(cls=plugin_cls)
+    output = ps.plugins.parse()
+    captured = capsys.readouterr()
+    for line in captured.out.split("\n"):
+        print(line)
+    assert isinstance(output, list)

@@ -50,7 +50,7 @@ exclude = '''
 '''
 
 [tool.pytest.ini_options]
-#addopts = "--cov=src/tmux_conf --cov-report=term-missing"
+addopts = "--cov=src/tmux_conf --cov-report=term-missing"
 testpaths = [
     "tests",
 ]
