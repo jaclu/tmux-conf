@@ -33,10 +33,14 @@ class VersionCheck:
         v_maj = parts[0]
         try:
             v_min = parts[1]
+        except IndexError as exc:
+            print(f"ERROR: Failed to extract v_min: {self._vers}")
+            raise IndexError from exc
+        try:
+            self.v_maj = int(v_maj)
         except ValueError as exc:
-            print(f"ERROR: Failed to parse version {self._vers}")
+            print(f"Error: v_maj was not int: {self._vers}")
             raise ValueError from exc
-        self.v_maj = int(v_maj)
         self.v_min, self.v_suffix = self.get_sub_vers(v_min)
 
     def get(self):
@@ -91,6 +95,8 @@ class VersionCheck:
             except ValueError:
                 break
             int_part += c
+        if not int_part:
+            raise ValueError("sub_vers had no int part")
         i = int(int_part)
         s = v2.split(int_part)[1]
         return i, s
