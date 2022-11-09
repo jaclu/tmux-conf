@@ -1,32 +1,21 @@
+import pytest
+
 from src.tmux_conf.vers_check import VersionCheck
 
 
 def test_vc_missing_subvers():
-    # for ints .0 is appended, strings are handled as is
-    r = False
-    try:
+    with pytest.raises(IndexError):
         VersionCheck("3")
-    except IndexError:
-        r = True
-    assert r is True
 
 
 def test_vc_maj_not_int():
-    r = False
-    try:
+    with pytest.raises(ValueError):
         VersionCheck("a.b")
-    except ValueError:
-        r = True
-    assert r is True
 
 
 def test_vc_bad_suffix():
-    r = False
-    try:
+    with pytest.raises(ValueError):
         VersionCheck("3.b")
-    except ValueError:
-        r = True
-    assert r is True
 
 
 def test_vc_low():
@@ -102,19 +91,11 @@ def test_vc_req_get():
 
 def test_vc_is_ok_no_min_vers():
     vc = VersionCheck(3.0)
-    r = False
-    try:
+    with pytest.raises(ValueError):
         vc.is_ok("3")
-    except ValueError:
-        r = True
-    assert r is True
 
 
 def test_vc_is_ok_maj_not_int():
     vc = VersionCheck(3.0)
-    r = False
-    try:
+    with pytest.raises(ValueError):
         vc.is_ok("a.b")
-    except ValueError:
-        r = True
-    assert r is True

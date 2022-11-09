@@ -1,5 +1,7 @@
 import os
 
+import pytest
+
 from src.tmux_conf.embedded_scripts import EmbeddedScripts
 
 from .common_vars import CONF_FILE
@@ -87,13 +89,9 @@ def test_es_content():
 
 
 def test_es_get_dir_embedded():
-    test_pass = False
     es = es_hello_world()
-    try:
+    with pytest.raises(SyntaxError):
         es.get_dir()
-    except SyntaxError:
-        test_pass = True
-    assert test_pass is True  # noqa
 
 
 def test_es_get_dir_external():

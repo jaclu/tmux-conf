@@ -1,3 +1,5 @@
+import pytest
+
 from src.tmux_conf.embedded_scripts import EmbeddedScripts
 from src.tmux_conf.plugins import Plugins
 from src.tmux_conf.vers_check import VersionCheck
@@ -15,12 +17,8 @@ def plugins_env():
 def test_plugins_bad_display():
     vc = VersionCheck(3.0)
     es = EmbeddedScripts(conf_file=CONF_FILE, use_embedded_scripts=True)
-    r = False
-    try:
+    with pytest.raises(ValueError):
         Plugins(conf_file=CONF_FILE, vers_class=vc, es_class=es, plugins_display=4)
-    except ValueError:
-        r = True
-    assert r is True
 
 
 def test_plugins_clear_plugind():
