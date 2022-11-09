@@ -18,13 +18,23 @@ def test_plugins_bad_display():
     vc = VersionCheck(3.0)
     es = EmbeddedScripts(conf_file=CONF_FILE, use_embedded_scripts=True)
     with pytest.raises(ValueError):
-        Plugins(conf_file=CONF_FILE, vers_class=vc, es_class=es, plugins_display=4)
+        Plugins(conf_file=CONF_FILE, vers_class=vc,
+                es_class=es, plugins_display=4)
+
+
+#  Needs handling stdout to be usefull
+def not_plugins_display_info():
+    vc = VersionCheck(3.0)
+    es = EmbeddedScripts(conf_file=CONF_FILE, use_embedded_scripts=True)
+    p = Plugins(conf_file=CONF_FILE, vers_class=vc, es_class=es)
+    p.display_info()
 
 
 def test_plugins_clear_plugind():
     vc = VersionCheck(3.0)
     es = EmbeddedScripts(conf_file=CONF_FILE, use_embedded_scripts=True)
-    Plugins(conf_file=CONF_FILE, vers_class=vc, es_class=es, clear_plugins=True)
+    Plugins(conf_file=CONF_FILE, vers_class=vc,
+            es_class=es, clear_plugins=True)
     # no exception is good enough for passing
 
 

@@ -1,4 +1,5 @@
 import os
+import pytest
 
 from src.tmux_conf.tmux_conf import TmuxConfig
 from src.tmux_conf.utils import run_shell
@@ -9,6 +10,17 @@ BIND_CMD = "bind -N 'This is a note'  a  display 'that was a'"
 CONTENT_LINE = "# Hello world"
 PLUGIN_SOURCE = "jaclu"
 PLUGIN_NAME = "tmux-prefix-highlight"
+
+
+class NotEmbedded(TmuxConfig):
+    """We combine not embedded and content in the same class.
+    They are used for separate tests so they dont overlap,
+    just handy to use a single class"""
+
+    use_embedded_scripts = False
+
+    def content(self):
+        self.write(CONTENT_LINE)
 
 
 class PluginsSample(TmuxConfig):
@@ -39,18 +51,23 @@ class PluginsDisabled(PluginsSample):
     plugin_handler = ""
 
 
-class NotEmbedded(TmuxConfig):
-    """We combine not embedded and content in the same class.
-    They are used for separate tests so they dont overlap,
-    just handy to use a single class"""
+class PluginsDuplicated(PluginsSample):
 
-    use_embedded_scripts = False
+    def plugin_prefix_highlight2(self):
+        #
+        #  Highlights when you press tmux prefix key and
+        #  when copy/sync mode is active.
+        #
+        conf = """
+        set -g @prefix_highlight_show_copy_mode  on
+        set -g @prefix_highlight_copy_mode_attr  "fg=black,bg=yellow,bold"
+        set -g @prefix_highlight_show_sync_mode  on
+        set -g @prefix_highlight_sync_mode_attr "fg=black,bg=orange,blink,bold"
+        """
+        return [f"{PLUGIN_SOURCE}/{PLUGIN_NAME}", 2.4, conf]
 
-    def content(self):
-        self.write(CONTENT_LINE)
 
-
-def prep_plugin_class(cls, version):
+def prep_plugin_class(cls, version=3.0):
     ps = cls(parse_cmd_line=False, conf_file=CONF_FILE, tmux_version=version)
     ps.plugins.scan(ps.list_plugin_methods())
     return ps
@@ -173,7 +190,8 @@ def test_tc_conf_file_header_and_content():
 def test_tc_plugin_found():
     ps = prep_plugin_class(cls=PluginsSample, version=2.4)
     assert ps.plugins.found() == [PLUGIN_NAME]
-    assert ps.plugins.found(short_name=False) == [f"{PLUGIN_SOURCE}/{PLUGIN_NAME}"]
+    assert ps.plugins.found(short_name=False) == [
+        f"{PLUGIN_SOURCE}/{PLUGIN_NAME}"]
 
 
 def test_tc_plugin_unavailable():
@@ -186,3 +204,8 @@ def test_tc_plugins_disabled():
     ps = prep_plugin_class(cls=PluginsDisabled, version=2.4)
     assert not ps.plugins.found()
     assert not ps.plugins.found(short_name=False)
+
+
+def test_tc_plugin_duplicate():
+    with pytest.raises(SystemExit):
+        ps = prep_plugin_class(cls=PluginsDuplicated, version=2.4)
