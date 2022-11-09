@@ -56,7 +56,8 @@ def test_es_create_external_sh():
 
 def test_es_run_it_posix():
     es = es_hello_world()
-    assert es.run_it(SCRIPT_NAME) == f'run "cut -c3- {CONF_FILE} | sh -s {SCRIPT_NAME}"'
+    assert es.run_it(
+        SCRIPT_NAME) == f'run "cut -c3- {CONF_FILE} | sh -s {SCRIPT_NAME}"'
 
 
 def test_es_run_it_bash():
@@ -103,7 +104,7 @@ def test_es_get_dir_external():
 def test_es_get_dir_external_def_conf():
     es = es_env(conf_file="~/.tmux.conf", use_embedded_scripts=False)
     d = es.get_dir()
-    assert d == f"{os.getenv('HOME') or ''}/.tmux/scripts"
+    assert d == f"{os.getenv('HOME')}/.tmux/scripts"
 
 
 def test_es_get_dir_external_rel_conf():
