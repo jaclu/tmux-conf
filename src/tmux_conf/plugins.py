@@ -180,7 +180,6 @@ class Plugins:
         max_l_v = 0
         self._skipped_plugins.sort()
         for vers, name in self._skipped_plugins:
-            print(f">> vers: {type(vers)}")
             max_l_v = max(max_l_v, len(vers))
         print("\t-----   Plugins ignored   -----")
         print(f'{"Min":<{max_l_v}}|{" Plugin name":<{max_l_name}}')
