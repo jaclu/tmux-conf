@@ -24,10 +24,10 @@ def test_utils_btick(test_input, expected):
 def test_utils_expanduser_plus():
     username = str(os.environ.get("USER"))
     tilde = utils.expanduser_plus("~")
-    assert tilde.find(username) > -1
     home = utils.expanduser_plus("$HOME")
-    assert home.find(username) > -1
     assert tilde == home
+    assert home.find(username) > -1
+    assert tilde.find(username) > -1
 
 
 @pytest.mark.parametrize(
