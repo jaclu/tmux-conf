@@ -48,7 +48,8 @@ class Plugins:
 
         self._is_limited_host = False
 
-        self._used_plugins: dict[str, tuple[str, Callable[[], list[str]], str]] = {}
+        self._used_plugins: dict[str,
+                                 tuple[str, Callable[[], list[str]], str]] = {}
         # self._used_plugins: dict[
         #     str, tuple[str, Callable[[], tuple[str, str, str]], str]
         # ] = {}  # plugins that will be used
@@ -120,15 +121,16 @@ class Plugins:
                 sys.exit(1)
             else:
                 duplicate_check.append(plugin_name)
-
+            #  Since plugi method might define vers_min as a float
+            #  we need to convert it to a string both for used and ignored plugins
             if self._vers.is_ok(vers_min):
                 self._used_plugins[plugin_name] = (
-                    vers_min,  # self.PLUGIN_VERS_MIN
+                    str(vers_min),  # self.PLUGIN_VERS_MIN
                     plugin_mthd,  # self.PLUGIN_MTHD
                     code,  # self.PLUGIN_STATIC_CODE
                 )
             else:
-                self._skipped_plugins.append((vers_min, plugin_name))
+                self._skipped_plugins.append((str(vers_min), plugin_name))
         self._skipped_plugins.sort()
 
     def display_info(self):
@@ -178,6 +180,7 @@ class Plugins:
         max_l_v = 0
         self._skipped_plugins.sort()
         for vers, name in self._skipped_plugins:
+            print(f">> vers: {type(vers)}")
             max_l_v = max(max_l_v, len(vers))
         print("\t-----   Plugins ignored   -----")
         print(f'{"Min":<{max_l_v}}|{" Plugin name":<{max_l_name}}')
@@ -234,7 +237,8 @@ class Plugins:
             #  plugin and install if missing
             #
             output.append(self.mkscript_manual_deploy())
-            output.append(self._es.run_it(self._fnc_activate_manually, in_bg=True))
+            output.append(self._es.run_it(
+                self._fnc_activate_manually, in_bg=True))
         elif self._plugin_handler:
             #
             #  For any other _plugin_handler setting, assume it is tpm

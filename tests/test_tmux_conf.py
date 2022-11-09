@@ -221,7 +221,7 @@ def test_tc_plugin_duplicate():
 @pytest.mark.parametrize(
     "vers, plugins_expected",
     [
-        ("2.2", 0),
+        (2.2, 0),
         (2.8, 1),
         (3.2, 2),
     ],
