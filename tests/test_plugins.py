@@ -1,8 +1,8 @@
-from .common_vars import CONF_FILE
-
 from src.tmux_conf.embedded_scripts import EmbeddedScripts
 from src.tmux_conf.plugins import Plugins
 from src.tmux_conf.vers_check import VersionCheck
+
+from .common_vars import CONF_FILE
 
 
 def plugins_env():
@@ -10,6 +10,24 @@ def plugins_env():
     es = EmbeddedScripts(conf_file=CONF_FILE, use_embedded_scripts=True)
     plugins = Plugins(conf_file=CONF_FILE, vers_class=vc, es_class=es)
     return plugins
+
+
+def test_plugins_bad_display():
+    vc = VersionCheck(3.0)
+    es = EmbeddedScripts(conf_file=CONF_FILE, use_embedded_scripts=True)
+    r = False
+    try:
+        Plugins(conf_file=CONF_FILE, vers_class=vc, es_class=es, plugins_display=4)
+    except ValueError:
+        r = True
+    assert r is True
+
+
+def test_plugins_clear_plugind():
+    vc = VersionCheck(3.0)
+    es = EmbeddedScripts(conf_file=CONF_FILE, use_embedded_scripts=True)
+    Plugins(conf_file=CONF_FILE, vers_class=vc, es_class=es, clear_plugins=True)
+    # no exception is good enough for passing
 
 
 def test_plugins_deploy_dir():

@@ -1,7 +1,8 @@
-from .common_vars import CONF_FILE
-
+import os
 from src.tmux_conf.tmux_conf import TmuxConfig
 from src.tmux_conf.utils import run_shell
+
+from .common_vars import CONF_FILE
 
 BIND_CMD = "bind -N 'This is a note'  a  display 'that was a'"
 CONTENT_LINE = "# Hello world"
@@ -122,7 +123,7 @@ def test_tc_filter_note_not_as_comment():
 def test_tc_conf_file_not_embedded():
     tc = NotEmbedded(parse_cmd_line=False, conf_file=CONF_FILE)
     tc.conf_file_header()
-    with open(CONF_FILE, encoding="utf-8") as f:
+    with open(os.path.expanduser(CONF_FILE), encoding="utf-8") as f:
         line = f.readline()  # Just get 1st line
     assert line == "#\n"
     tc.remove_conf_file()
@@ -131,7 +132,7 @@ def test_tc_conf_file_not_embedded():
 def test_tc_conf_file_is_embedded():
     tc = tc_env()
     tc.conf_file_header()
-    with open(CONF_FILE, encoding="utf-8") as f:
+    with open(os.path.expanduser(CONF_FILE), encoding="utf-8") as f:
         line = f.readline()  # Just get 1st line
     assert line.find("EMBEDDED-SCRIPTS-STARTING-POINT") > -1
     tc.remove_conf_file()
@@ -139,18 +140,19 @@ def test_tc_conf_file_is_embedded():
 
 def test_tc_conf_file_header_and_content():
     """Check that TMUX_CONF & TMUX_BIN are correctly set"""
+    fname = os.path.expanduser(CONF_FILE)
     tc = NotEmbedded(parse_cmd_line=False, conf_file=CONF_FILE)
     tc.replace_config = True
     tc.conf_file_header()
     tc.run()
-    with open(CONF_FILE, encoding="utf-8") as f:
+    with open(os.path.expanduser(fname), encoding="utf-8") as f:
         lines = f.readlines()
     tmux_bin_found = False
     edit_conf_found = False
     for line in lines:
         if line.find("TMUX_CONF=") > -1:
             conf_file = line.split("=")[1].strip()
-            assert conf_file == f'"{CONF_FILE}"'
+            assert conf_file == f'"{fname}"'
         if line.find("TMUX_BIN=") > -1:
             tmux_bin = line.split("=")[1].strip()
             assert tmux_bin == f'"{tc.tmux_bin}"'
@@ -170,8 +172,7 @@ def test_tc_conf_file_header_and_content():
 def test_tc_plugin_found():
     ps = prep_plugin_class(cls=PluginsSample, version=2.4)
     assert ps.plugins.found() == [PLUGIN_NAME]
-    assert ps.plugins.found(short_name=False) == [
-        f"{PLUGIN_SOURCE}/{PLUGIN_NAME}"]
+    assert ps.plugins.found(short_name=False) == [f"{PLUGIN_SOURCE}/{PLUGIN_NAME}"]
 
 
 def test_tc_plugin_unavailable():

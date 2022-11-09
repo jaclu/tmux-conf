@@ -1,1 +1,1 @@
-CONF_FILE = "/tmp/tmux_test/tmux.conf"
+CONF_FILE = "~/tmp/tmux_test/tmux/tmux.conf"

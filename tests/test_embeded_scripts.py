@@ -1,6 +1,8 @@
-from .common_vars import CONF_FILE
+import os
 
 from src.tmux_conf.embedded_scripts import EmbeddedScripts
+
+from .common_vars import CONF_FILE
 
 SCRIPT_NAME = "foo123"
 
@@ -11,8 +13,8 @@ def es_env(conf_file=CONF_FILE, use_embedded_scripts=True):
     )
 
 
-def es_hello_world(use_embedded_scripts=True, use_bash=False):
-    es = es_env(use_embedded_scripts=use_embedded_scripts)
+def es_hello_world(conf_file=CONF_FILE, use_embedded_scripts=True, use_bash=False):
+    es = es_env(conf_file=conf_file, use_embedded_scripts=use_embedded_scripts)
     sh = [
         f"""
 {SCRIPT_NAME}() {{
@@ -24,10 +26,35 @@ def es_hello_world(use_embedded_scripts=True, use_bash=False):
     return es
 
 
+def get_shebang(fname):
+    with open(fname, encoding="utf-8") as f:
+        line = f.readline()  # Just get 1st line
+    return line.strip()
+
+
+def test_es_relative_conf_file():
+    es = es_env("dummy_conf")
+    print(f">> conf_file: {es._conf_file}")
+    assert es._conf_file[0] == "~"
+
+
+def test_es_create_external_bash():
+    es = es_hello_world(use_embedded_scripts=False, use_bash=True)
+    bash_sh = es.run_it(SCRIPT_NAME).split('"')[1]
+    # Simplify by not caring about path to bash
+    assert get_shebang(bash_sh) == "#!/usr/bin/env bash"
+
+
+def test_es_create_external_sh():
+    es = es_hello_world(use_embedded_scripts=False)
+    bash_sh = es.run_it(SCRIPT_NAME).split('"')[1]
+    # Simplify by not caring about path to bash
+    assert get_shebang(bash_sh) == "#!/bin/sh"
+
+
 def test_es_run_it_posix():
     es = es_hello_world()
-    assert es.run_it(
-        SCRIPT_NAME) == f'run "cut -c3- {CONF_FILE} | sh -s {SCRIPT_NAME}"'
+    assert es.run_it(SCRIPT_NAME) == f'run "cut -c3- {CONF_FILE} | sh -s {SCRIPT_NAME}"'
 
 
 def test_es_run_it_bash():
@@ -37,6 +64,14 @@ def test_es_run_it_bash():
     assert (
         s.startswith(f'run "cut -c3- {CONF_FILE} | ') is True
         and s.endswith(f'/bash -s {SCRIPT_NAME}"') is True
+    )
+
+
+def test_es_run_it_in_bg():
+    es = es_hello_world()
+    assert (
+        es.run_it(SCRIPT_NAME, in_bg=True)
+        == f'run -b "cut -c3- {CONF_FILE} | sh -s {SCRIPT_NAME}"'
     )
 
 
@@ -65,3 +100,15 @@ def test_es_get_dir_external():
     es = es_hello_world(use_embedded_scripts=False)
     d = es.get_dir()
     assert d.endswith("/scripts")
+
+
+def test_es_get_dir_external_def_conf():
+    es = es_env(conf_file="~/.tmux.conf", use_embedded_scripts=False)
+    d = es.get_dir()
+    assert d == f"{os.getenv('HOME') or ''}/.tmux/scripts"
+
+
+def test_es_get_dir_external_rel_conf():
+    es = es_env(conf_file="tmux.conf", use_embedded_scripts=False)
+    d = es.get_dir()
+    assert d.endswith("/tmux/scripts")
