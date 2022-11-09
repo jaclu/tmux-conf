@@ -43,6 +43,9 @@ class PluginsSample(TmuxConfig):
         """
         return [f"{PLUGIN_SOURCE}/{PLUGIN_NAME}", 2.4, conf]
 
+    def plugin_session_wizard(self):  # 3.2
+        return ["27medkamal/tmux-session-wizard", 3.2, "#  Default trigger: <prefix> T"]
+
 
 class PluginsDisabled(PluginsSample):
     """Test class ensuring no plugins show up if plugin_handler is
@@ -67,7 +70,7 @@ class PluginsDuplicated(PluginsSample):
         return [f"{PLUGIN_SOURCE}/{PLUGIN_NAME}", 2.4, conf]
 
 
-def prep_plugin_class(cls, version=3.0):
+def prep_plugin_class(cls, version=2.8):
     ps = cls(parse_cmd_line=False, conf_file=CONF_FILE, tmux_version=version)
     ps.plugins.scan(ps.list_plugin_methods())
     return ps
@@ -209,3 +212,40 @@ def test_tc_plugins_disabled():
 def test_tc_plugin_duplicate():
     with pytest.raises(SystemExit):
         ps = prep_plugin_class(cls=PluginsDuplicated, version=2.4)
+
+
+#
+#  Checks that only plugins of matching version are selected
+#
+
+@pytest.mark.parametrize(
+    "vers, plugins_expected",
+    [
+        ("2.2", 0),
+        (2.8, 1),
+        (3.2, 2),
+    ],
+)
+def test_tc_plugins_display_info(vers, plugins_expected, capsys):
+    ps = prep_plugin_class(cls=PluginsSample, version=vers)
+    # to test both verbose and not for plugin display...
+    if plugins_expected == 2:
+        ps.plugins._plugins_display = 3
+    elif plugins_expected == 1:
+        ps.plugins._plugins_display = 2
+    try:
+        ps.plugins.display_info()
+    except SystemExit:
+        #  display_info() terminates prog after displaying info,
+        #  this forces continuation
+        pass
+    captured = capsys.readouterr()
+    do_count = True
+    plugins_found = 0
+    for l in captured.out.split('\n'):
+        if do_count and l and l[0] == ">":
+            print(l)
+            plugins_found += 1
+        if l.find('|  Min') > -1:
+            do_count = True
+    assert plugins_found == plugins_expected
