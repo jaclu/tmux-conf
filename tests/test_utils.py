@@ -1,6 +1,8 @@
+# import pytest
+
 import os
 
-from tmux_conf import utils
+from src.tmux_conf import utils
 
 
 def test_utils_btick():

@@ -1,8 +1,8 @@
-from common_vars import CONF_FILE
+from .common_vars import CONF_FILE
 
-from tmux_conf.embedded_scripts import EmbeddedScripts
-from tmux_conf.plugins import Plugins
-from tmux_conf.vers_check import VersionCheck
+from src.tmux_conf.embedded_scripts import EmbeddedScripts
+from src.tmux_conf.plugins import Plugins
+from src.tmux_conf.vers_check import VersionCheck
 
 
 def plugins_env():

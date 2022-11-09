@@ -1,6 +1,6 @@
-from common_vars import CONF_FILE
+from .common_vars import CONF_FILE
 
-from tmux_conf.embedded_scripts import EmbeddedScripts
+from src.tmux_conf.embedded_scripts import EmbeddedScripts
 
 SCRIPT_NAME = "foo123"
 
@@ -26,7 +26,8 @@ def es_hello_world(use_embedded_scripts=True, use_bash=False):
 
 def test_es_run_it_posix():
     es = es_hello_world()
-    assert es.run_it(SCRIPT_NAME) == f'run "cut -c3- {CONF_FILE} | sh -s {SCRIPT_NAME}"'
+    assert es.run_it(
+        SCRIPT_NAME) == f'run "cut -c3- {CONF_FILE} | sh -s {SCRIPT_NAME}"'
 
 
 def test_es_run_it_bash():

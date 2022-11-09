@@ -1,7 +1,7 @@
-from common_vars import CONF_FILE
+from .common_vars import CONF_FILE
 
-from tmux_conf.tmux_conf import TmuxConfig
-from tmux_conf.utils import run_shell
+from src.tmux_conf.tmux_conf import TmuxConfig
+from src.tmux_conf.utils import run_shell
 
 BIND_CMD = "bind -N 'This is a note'  a  display 'that was a'"
 CONTENT_LINE = "# Hello world"
@@ -170,7 +170,8 @@ def test_tc_conf_file_header_and_content():
 def test_tc_plugin_found():
     ps = prep_plugin_class(cls=PluginsSample, version=2.4)
     assert ps.plugins.found() == [PLUGIN_NAME]
-    assert ps.plugins.found(short_name=False) == [f"{PLUGIN_SOURCE}/{PLUGIN_NAME}"]
+    assert ps.plugins.found(short_name=False) == [
+        f"{PLUGIN_SOURCE}/{PLUGIN_NAME}"]
 
 
 def test_tc_plugin_unavailable():

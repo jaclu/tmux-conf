@@ -1,4 +1,4 @@
-from tmux_conf.vers_check import VersionCheck
+from src.tmux_conf.vers_check import VersionCheck
 
 
 def test_vc_low():
