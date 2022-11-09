@@ -45,7 +45,7 @@ def is_executable(cmd: str) -> bool:
     return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
 
 
-def parse_cmdline():
+def parse_cmdline(args):
     parser = argparse.ArgumentParser(
         description="This tmux conf compiler generates configs for tmux "
         + "versions 1.5 and up."
@@ -99,7 +99,7 @@ def parse_cmdline():
         default="~/.tmux.conf",
         help="Config file to be created, Defaults to ~/.tmux.conf",
     )
-    return parser.parse_args()
+    return parser.parse_args(args)
 
 
 def run_shell(cmd: str) -> str:
@@ -150,6 +150,9 @@ def verify_conf_file_usable(conf_file: str) -> str:
     except PermissionError as error:
         print("ERROR: Could not create directory for config file!")
         raise PermissionError from error
+    except OSError as error:
+        print(f"ERRPR: read only file system reported for {conf_file}")
+        raise OSError from error
 
     #  Ensure it can be written to
     # pylint: disable=too-many-try-statements

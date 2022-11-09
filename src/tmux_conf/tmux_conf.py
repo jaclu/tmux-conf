@@ -103,7 +103,7 @@ class TmuxConfig:
         # then terminate
     ):
         if parse_cmd_line:
-            args = parse_cmdline()
+            args = parse_cmdline(sys.argv[1:])
             conf_file = args.conf_file
             tmux_bin = args.tmux_bin
             tmux_version = args.forced_version
