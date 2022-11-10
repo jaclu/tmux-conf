@@ -290,10 +290,7 @@ def test_tc_plugins_display_info(vers, plugins_expected, capsys):
         (PluginsManual),
     ],
 )
-def test_tc_plugins_parse(plugin_cls, capsys):
+def test_tc_plugins_parse(plugin_cls):
     ps = prep_plugin_class(cls=plugin_cls)
     output = ps.plugins.parse()
-    captured = capsys.readouterr()
-    for line in captured.out.split("\n"):
-        print(line)
     assert isinstance(output, list)
