@@ -64,6 +64,20 @@ I prefer to use embedded scripts, this ensures that no out of date
 scripts hang around in scripts/ and eliminates risk of scripts not found
 if they are deleted, but either is valid so entirely up to you.
 
+##  Background scripts
+
+If the script is intended to run in the background add the param in_bg=True
+
+```python
+    w(f"bind -N 'Toggle mouse on/off'  M  {self.es.run_it(self.fnc_toggle_mouse, in_bg=True)}")
+```
+
+Resulting in:
+
+```tmux
+bind -N 'Toggle mouse on/off'  M  run -b "cut -c3- ~/.tmux.conf | sh -s toggle_mouse"
+```
+
 ## Bash
 
 Default is to assume /bin/sh style POSIX scripts. If bash functionality
@@ -88,19 +102,20 @@ will be set.
 
 The main thing to be aware of is that if embedded scripts are used,
 some considerations about handling backticks must be made.
-
 Any un-escaped backticks in the conf file will cause embedded scripts to
 fail. This is the case both for tmux code and comments.
 
-Any backtick must use \\\` notation in the final conf file.
-Not "\`" or '\`' otherwise the embedded script will fail to run,
-reporting an error.
+If not preceeded by a backslash, it would tell any embedded scripts that this indicates
+a start of a shell command. If it is outside the scope of the function it is about to run,
+it would never run that snipet, but if there is not another matching backtick indicating the
+end of this "shell-command", it will lead to failure reading the script, 
+and be treated as a syntax error.
 
+Any backtick must use \\\` notation in the final conf file.
+Not "\`" or '\`'.
 This means you have to double escape it in your Python code to ensure
 the resulting tmux conf code is correctly escaped.
 
 Probably the simplest thing to do is to just avoid using backticks. 
-The number of attempts it took me to write this before I got all the escaping to 
-generate the intended code was pure pain.
 
 For external scripts there is no backtick issue with the tmux.conf file
