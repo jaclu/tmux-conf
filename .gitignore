@@ -3,6 +3,8 @@
 *~
 *#
 
+other/
+
 # MacOS cruft
 .DS_STORE
 
