@@ -492,7 +492,7 @@ class TmuxConfig:
         pre = parts[0].strip()
         post = parts[1].strip()
         p0 = post[0]
-        if (p0) in {'"', "'"}:
+        if p0 in {'"', "'"}:
             end_note = post[1:].find(p0)
             x = end_note + 1
             note = post[1:x]
