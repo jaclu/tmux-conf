@@ -38,7 +38,7 @@ class EmbeddedScripts:
         self._bash_scripts: list[str] = []
         self._bash_shell = ""  # Will only be set if needed
 
-    def create(self, scr_name: str, script: list[str], use_bash: bool = False):
+    def create(self, scr_name: str, script, use_bash=False):
         """Creates a script, supplied as a list of lines
         script lines can be regular lines as string, or multi-line strings
 
@@ -108,7 +108,7 @@ class EmbeddedScripts:
         cmd += '"'
         return cmd
 
-    def content(self) -> list[str]:
+    def content(self):
         """Generates the code for embedded scripts to be written to
         the conf file"""
         if not (self._use_embedded_scripts and self._scripts):

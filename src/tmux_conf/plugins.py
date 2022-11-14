@@ -48,8 +48,7 @@ class Plugins:
 
         self._is_limited_host = False
 
-        self._used_plugins: dict[str,
-                                 tuple[str, Callable[[], list[str]], str]] = {}
+        self._used_plugins: dict[str, tuple[str, Callable[[], list[str]], str]] = {}
         # self._used_plugins: dict[
         #     str, tuple[str, Callable[[], tuple[str, str, str]], str]
         # ] = {}  # plugins that will be used
@@ -110,10 +109,10 @@ class Plugins:
         self._is_limited_host = is_limited
         return self._is_limited_host
 
-    def scan(self, plugin_methods: list[Callable[[], list[str]]]) -> None:
+    def scan(self, plugin_methods) -> None:
         """Investigate all defined plugin methods, and determine if a
         given plugin can be used depending on running tmux"""
-        duplicate_check: list[str] = []
+        duplicate_check = []
         for plugin_mthd in plugin_methods:
             plugin_name, vers_min, code = plugin_mthd()
             if plugin_name in duplicate_check:
@@ -165,7 +164,7 @@ class Plugins:
                 #  Skip indention, for easier read
                 #
                 for line in info[PLUGIN_STATIC_CODE].split("\n"):
-                    if line := line.strip():
+                    if line == line.strip():
                         print(f"{line}")
                 print()
             else:
@@ -189,7 +188,7 @@ class Plugins:
 
         sys.exit(1)
 
-    def parse(self) -> list[Union[str, list[str]]]:
+    def parse(self):
         """This package will use any plugin defining methods it can find.
         They will be sorted alphabetically by method name, normally the order
         of plugins do not matter, but if you do want to force the sorting,
@@ -236,8 +235,7 @@ class Plugins:
             #  plugin and install if missing
             #
             output.append(self.mkscript_manual_deploy())
-            output.append(self._es.run_it(
-                self._fnc_activate_manually, in_bg=True))
+            output.append(self._es.run_it(self._fnc_activate_manually, in_bg=True))
         elif self._plugin_handler:
             #
             #  For any other _plugin_handler setting, assume it is tpm
@@ -248,7 +246,7 @@ class Plugins:
         output.append("")  # spacer between sections
         return output
 
-    def get_env(self) -> tuple[str, str]:
+    def get_env(self):
         location = os.path.dirname(os.path.expanduser(self._conf_file))
         if location == os.path.expanduser("~"):
             #
@@ -289,7 +287,7 @@ class Plugins:
             )
         return plugins_dir, tpm_env
 
-    def mkscript_manual_deploy(self) -> list[str]:
+    def mkscript_manual_deploy(self):
         """This script is run as tmux starts, all non-present
         plugins are installed, and an attempt is done to initialize
         each plugin.
@@ -338,7 +336,7 @@ class Plugins:
         )
         return output
 
-    def mkscript_tpm_deploy(self) -> list[str]:
+    def mkscript_tpm_deploy(self):
         """If tpm is present, it is started.
         If not, it is installed and requested to install all
         defined plugins.

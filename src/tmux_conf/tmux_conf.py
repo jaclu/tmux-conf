@@ -473,7 +473,7 @@ class TmuxConfig:
                         )
                     f.write(f"{line}{eol}")
 
-    def filter_note(self, line: str) -> list[str]:
+    def filter_note(self, line: str):
         """Returns list of lines, if notes are not supported
         first an empty spacer line, then the note as a comment,
         and finally the actual command without the note
@@ -491,7 +491,8 @@ class TmuxConfig:
         parts = line.split("-N")
         pre = parts[0].strip()
         post = parts[1].strip()
-        if (p0 := post[0]) in {'"', "'"}:
+        p0 = post[0]
+        if (p0) in {'"', "'"}:
             end_note = post[1:].find(p0)
             x = end_note + 1
             note = post[1:x]
@@ -599,7 +600,8 @@ class TmuxConfig:
         the second part of version is int"""
         if not cmd:
             raise SyntaxError("cmd empty")
-        if not (c := shutil.which(cmd)):
+        c = shutil.which(cmd)
+        if not c:
             raise SyntaxError(f"tmux cmd not found: {cmd}")
         cmd = c
         output = run_shell(f"{cmd} -V")
