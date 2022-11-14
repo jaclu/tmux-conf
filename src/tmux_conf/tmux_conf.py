@@ -503,6 +503,8 @@ class TmuxConfig:
                 note_end = post.find(" ")
                 note = post.split()[0]
                 post = post[note_end:]
+        else:
+            note = ""
 
         # pylint: disable=while-used,compare-to-zero
         while post.find("   ") == 0:
