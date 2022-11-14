@@ -491,17 +491,18 @@ class TmuxConfig:
         parts = line.split("-N")
         pre = parts[0].strip()
         post = parts[1].strip()
-        p0 = post[0]
-        if p0 in {'"', "'"}:
-            end_note = post[1:].find(p0)
-            x = end_note + 1
-            note = post[1:x]
-            y = end_note + 2
-            post = post[y:]
-        else:  # single word note
-            note_end = post.find(" ")
-            note = post.split()[0]
-            post = post[note_end:]
+        if post:
+            p0 = post[0]
+            if p0 in {'"', "'"}:
+                end_note = post[1:].find(p0)
+                x = end_note + 1
+                note = post[1:x]
+                y = end_note + 2
+                post = post[y:]
+            else:  # single word note
+                note_end = post.find(" ")
+                note = post.split()[0]
+                post = post[note_end:]
 
         # pylint: disable=while-used,compare-to-zero
         while post.find("   ") == 0:
