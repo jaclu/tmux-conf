@@ -491,6 +491,9 @@ class TmuxConfig:
         parts = line.split("-N")
         pre = parts[0].strip()
         post = parts[1].strip()
+        if not post:
+            # Propably an -N at end of line, so not related to a note
+            return [line]
         p0 = post[0]
         if p0 in {'"', "'"}:
             end_note = post[1:].find(p0)
