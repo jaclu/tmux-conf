@@ -272,7 +272,7 @@ def test_tc_plugins_display_info(vers, plugins_expected, capsys):
     plugins_found = 0
     for line in captured.out.split("\n"):
         print(line)
-        if line.find("Plugins ignored") > -1:
+        if line.find("Plugins ignored") > -1 or line.find("Unused plugins found") > -1:
             #  Stop counting when ignored list starts
             do_count = False
         if do_count and line.find(" - ") > -1:

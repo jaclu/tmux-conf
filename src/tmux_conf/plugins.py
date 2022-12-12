@@ -149,29 +149,68 @@ class Plugins:
             print(f'{"Plugin":<{max_l_name}}|  Min version\n')
 
         #
+        #  Create list of items in plugins dir
+        #
+        # plugin_items = next(os.walk(self.get_deploy_dir()))[1]
+        plugin_items = []
+        plugin_dir = self.get_deploy_dir()
+        if os.path.exists(plugin_dir):
+            for f in os.scandir(plugin_dir):
+                if f.is_dir():
+                    plugin_items.append((f.path.split("/")[-1]))
+
+        if "tpm" in plugin_items:
+            plugin_items.remove("tpm")
+        #
         #  When exec'ing the plugin code below, write output to stdout,
         #  not to config file. Since program will exit after displaying
         #  plugin details, no need to reset this variable.
         #
         verbose = self._plugins_display == 3
 
+        missing_plugins = []
         for name, info in self._used_plugins.items():
             if verbose:
-                print("".ljust(len(name), "-"))
-                print(f"> {name:<{max_l_name - 2}} - {info[PLUGIN_VERS_MIN]}")
+                sans_prefix = name.split("/")[1]
+                if sans_prefix in plugin_items:
+                    plugin_items.remove(sans_prefix)
+                    suffix = ""
+                else:
+                    suffix = " *** Not installed ***"
+                print("".ljust(len(name) + 2, "-"))
+                print(f"> {name:<{max_l_name - 2}} - {info[PLUGIN_VERS_MIN]} {suffix}")
                 info[PLUGIN_MTHD]()
                 #
                 #  Skip indention, for easier read
                 #
                 for line in info[PLUGIN_STATIC_CODE].split("\n"):
-                    if line == line.strip():
-                        print(f"{line}")
-                print()
+                    # if line == line.strip():
+                    print(f"{line.strip()}")
+                # print()
             else:
-                print(f"{name:<{max_l_name}} - {info[PLUGIN_VERS_MIN]}")
+                sans_prefix = name.split("/")[1]
+                if sans_prefix in plugin_items:
+                    plugin_items.remove(sans_prefix)
+                    suffix = ""
+                else:
+                    suffix = " *** Not installed ***"
+                print(f"{name:<{max_l_name}} - {info[PLUGIN_VERS_MIN]} {suffix}")
+
+        for _, name in self._skipped_plugins:
+            if name.find("/") > -1:
+                sans_prefix = name.split("/")[1]
+            else:
+                sans_prefix = name
+            if sans_prefix in plugin_items:
+                plugin_items.remove(sans_prefix)
+
+        if plugin_items:
+            print("\n-----   Unused plugins found   -----")
+            for s in plugin_items:
+                print("\t", s)
 
         if not self._skipped_plugins or self._plugins_display != 2:
-            sys.exit(1)
+            sys.exit(0)
 
         if self._skipped_plugins:
             print()
@@ -180,13 +219,13 @@ class Plugins:
         self._skipped_plugins.sort()
         for vers, name in self._skipped_plugins:
             max_l_v = max(max_l_v, len(vers))
-        print("\t-----   Plugins ignored   -----")
+        print("-----   Plugins ignored   -----")
         print(f'{"Min":<{max_l_v}}|{" Plugin name":<{max_l_name}}')
         print(f'{"vers":<{max_l_v}}|\n')
         for vers, name in self._skipped_plugins:
             print(f"{vers:>{max_l_v}}  {name:<{max_l_name}}")
 
-        sys.exit(1)
+        sys.exit(0)
 
     def parse(self):
         """This package will use any plugin defining methods it can find.
