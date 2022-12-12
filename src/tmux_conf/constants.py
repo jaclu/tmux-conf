@@ -8,6 +8,6 @@
 #  See the README.md in the repository for more info
 #
 
-__version__ = "0.15.7"
+__version__ = "0.15.8"
 
 XDG_CONFIG_HOME = "XDG_CONFIG_HOME"
