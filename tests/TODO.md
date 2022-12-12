@@ -24,4 +24,3 @@ missing
 ### Unused plugins found
 
 Create a dir in plugins, and verify that it is listed as an unused plugin
-
