@@ -168,7 +168,6 @@ class Plugins:
         #
         verbose = self._plugins_display == 3
 
-        missing_plugins = []
         for name, info in self._used_plugins.items():
             if verbose:
                 sans_prefix = name.split("/")[1]
