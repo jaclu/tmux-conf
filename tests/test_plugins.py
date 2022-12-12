@@ -1,7 +1,6 @@
 import os
 
 import pytest
-
 from src.tmux_conf.embedded_scripts import EmbeddedScripts
 from src.tmux_conf.plugins import Plugins
 from src.tmux_conf.vers_check import VersionCheck
@@ -9,10 +8,12 @@ from src.tmux_conf.vers_check import VersionCheck
 from .common_vars import CONF_FILE
 
 
-def plugins_env(conf_file=CONF_FILE):
+def plugins_env(conf_file=CONF_FILE, plugins_display=0):
     vc = VersionCheck(3.0)
     es = EmbeddedScripts(conf_file=conf_file, use_embedded_scripts=True)
-    plugins = Plugins(conf_file=conf_file, vers_class=vc, es_class=es)
+    plugins = Plugins(
+        conf_file=conf_file, vers_class=vc, es_class=es, plugins_display=plugins_display
+    )
     return plugins
 
 
@@ -80,3 +81,9 @@ def test_plugins_parse():
     """Do a parse with no plugins defined"""
     plugins = plugins_env()
     assert not plugins.parse()
+
+
+def test_plugins_def_conf_disp_info():
+    plugins = plugins_env("~/.tmux.conf", plugins_display=1)
+    with pytest.raises(SystemExit):
+        plugins.display_info()
