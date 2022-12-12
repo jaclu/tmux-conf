@@ -34,7 +34,7 @@ attempt something not supported on that system.
 
 Simplest way to install is using `pip install tmux-conf`
 
-## Suggested aproach
+## Suggested approach
 
 Drop your current tmux.conf inside a content() method, wrapping stuff
 to be written to the conf file inside write() statements. If you
@@ -130,7 +130,7 @@ widely available.
 
 ## Version checks
 
-Param for calls to vers_ok() is flexible, can be either int, float or
+Parameter for calls to vers_ok() is flexible, can be either int, float or
 string. In most cases a float is sufficient, like 2.8
 
 Since some versions include a trailing letter, like 3.3a, then a string

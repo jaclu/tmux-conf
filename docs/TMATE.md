@@ -23,8 +23,8 @@ all references to tmux in the scripts of the plugin to instead use
 $TMUX_BIN, this way it inherits what tmux bin to use (in this case tmate)
 from the environment.
 
-Even with that fix, sometimes they simply dont work under tmate,
-even if they are suposed to be 2.4 compatible, so it is a bit hit-and-miss.
+Even with that fix, sometimes they simply don't work under tmate,
+even if they are supposed to be 2.4 compatible, so it is a bit hit-and-miss.
 
 All that is needed to make the plugin usable without tmux-conf, is to add
 this code snippet in the common script used to set up the environment,

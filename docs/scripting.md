@@ -2,7 +2,7 @@
 
 In principle full scripting can be embedded using tmux statements, but it
 tends to be error prone and rather complex, so therefore support for
-normal scripts is included. Either embeded or stored in separate
+normal scripts is included. Either embedded or stored in separate
 files.
 
 [src/tmux_conf/embedded_scripts.py](https://github.com/jaclu/tmux-conf/blob/main/src/tmux_conf/embedded_scripts.py) handles scripting
@@ -105,10 +105,10 @@ some considerations about handling backticks must be made.
 Any un-escaped backticks in the conf file will cause embedded scripts to
 fail. This is the case both for tmux code and comments.
 
-If not preceeded by a backslash, it would tell any embedded scripts that this indicates
+If not preceded by a backslash, it would tell any embedded scripts that this indicates
 a start of a shell command. If it is outside the scope of the function it is about to run,
-it would never run that snipet, but if there is not another matching backtick indicating the
-end of this "shell-command", it will lead to failure reading the script, 
+it would never run that snippet, but if there is not another matching backtick indicating the
+end of this "shell-command", it will lead to failure reading the script,
 and be treated as a syntax error.
 
 Any backtick must use \\\` notation in the final conf file.
@@ -116,6 +116,6 @@ Not "\`" or '\`'.
 This means you have to double escape it in your Python code to ensure
 the resulting tmux conf code is correctly escaped.
 
-Probably the simplest thing to do is to just avoid using backticks. 
+Probably the simplest thing to do is to just avoid using backticks.
 
 For external scripts there is no backtick issue with the tmux.conf file
