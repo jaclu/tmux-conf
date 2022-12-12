@@ -3,7 +3,6 @@ from pathlib import Path
 from stat import S_IREAD, S_IWRITE
 
 import pytest
-
 from src.tmux_conf import utils
 
 from .common_vars import CONF_FILE
@@ -125,12 +124,9 @@ def test_utils_conf_file_useable_relative():
     #  Test that if no path is given, it is expanded to cwd
     #
     conf_relative = "local_conf.conf"
-    full_path_cf = utils.verify_conf_file_usable(conf_relative)
-    # get where this is run
-    path_test = Path(os.path.dirname(os.path.realpath(__file__)))
-    # get parent dir, assumed to be proj dir
-    path_proj = path_test.parent.absolute()
-    assert full_path_cf == f"{path_proj}/{conf_relative}"
+    conf_file = os.path.join(os.getcwd(), conf_relative)
+    generated_full_path_cf = utils.verify_conf_file_usable(conf_relative)
+    assert generated_full_path_cf == conf_file
 
 
 def test_utils_conf_file_useable_readonly_fs():
