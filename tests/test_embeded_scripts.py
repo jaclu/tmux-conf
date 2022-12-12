@@ -1,7 +1,6 @@
 import os
 
 import pytest
-
 from src.tmux_conf.embedded_scripts import EmbeddedScripts
 
 from .common_vars import CONF_FILE
@@ -24,6 +23,12 @@ def es_hello_world(conf_file=CONF_FILE, use_embedded_scripts=True, use_bash=Fals
 }}
     """
     ]
+    sh.append(
+        """
+
+
+    """
+    )
     es.create(SCRIPT_NAME, sh, use_bash=use_bash)
     return es
 
@@ -35,9 +40,10 @@ def get_shebang(fname):
 
 
 def test_es_relative_conf_file():
-    es = es_env("dummy_conf")
+    conf_file = "dummy_conf"
+    es = es_env(conf_file)
     print(f">> conf_file: {es._conf_file}")
-    assert es._conf_file[0] == "~"
+    assert es._conf_file.split("/")[-1] == conf_file
 
 
 def test_es_create_external_bash():
@@ -56,8 +62,7 @@ def test_es_create_external_sh():
 
 def test_es_run_it_posix():
     es = es_hello_world()
-    assert es.run_it(
-        SCRIPT_NAME) == f'run "cut -c3- {CONF_FILE} | sh -s {SCRIPT_NAME}"'
+    assert es.run_it(SCRIPT_NAME) == f'run "cut -c3- {CONF_FILE} | sh -s {SCRIPT_NAME}"'
 
 
 def test_es_run_it_bash():
