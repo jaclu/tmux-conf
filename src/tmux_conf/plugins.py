@@ -88,7 +88,7 @@ class Plugins:
             result.append(name)
         return result
 
-    def get_deploy_dir(self) -> str:
+    def get_plugin_dir(self) -> str:
         """Returns dir where plugins will be installed."""
         plugins_dir, _ = self.get_env()
         return plugins_dir
@@ -151,16 +151,15 @@ class Plugins:
         #
         #  Create list of items in plugins dir
         #
-        # plugin_items = next(os.walk(self.get_deploy_dir()))[1]
+        # plugin_items = next(os.walk(self.get_plugin_dir()))[1]
         plugin_items = []
-        plugin_dir = self.get_deploy_dir()
+        plugin_dir = self.get_plugin_dir()
         if os.path.exists(plugin_dir):
             for f in os.scandir(plugin_dir):
                 if f.is_dir():
                     plugin_items.append((f.path.split("/")[-1]))
+        _ = self._remove_if_found(plugin_items, "tpm")
 
-        if "tpm" in plugin_items:
-            plugin_items.remove("tpm")
         #
         #  When exec'ing the plugin code below, write output to stdout,
         #  not to config file. Since program will exit after displaying
@@ -170,12 +169,10 @@ class Plugins:
 
         for name, info in self._used_plugins.items():
             if verbose:
-                sans_prefix = name.split("/")[1]
-                if sans_prefix in plugin_items:
-                    plugin_items.remove(sans_prefix)
-                    suffix = ""
-                else:
-                    suffix = " *** Not installed ***"
+                name = self._name_sans_prefix(name)
+                suffix = self._remove_if_found(
+                    plugin_items, name, " *** Not installed ***"
+                )
                 print("".ljust(len(name) + 2, "-"))
                 print(f"> {name:<{max_l_name - 2}} - {info[PLUGIN_VERS_MIN]} {suffix}")
                 info[PLUGIN_MTHD]()
@@ -187,21 +184,15 @@ class Plugins:
                     print(f"{line.strip()}")
                 # print()
             else:
-                sans_prefix = name.split("/")[1]
-                if sans_prefix in plugin_items:
-                    plugin_items.remove(sans_prefix)
-                    suffix = ""
-                else:
-                    suffix = " *** Not installed ***"
+                name = self._name_sans_prefix(name)
+                suffix = self._remove_if_found(
+                    plugin_items, name, " *** Not installed ***"
+                )
                 print(f"{name:<{max_l_name}} - {info[PLUGIN_VERS_MIN]} {suffix}")
 
         for _, name in self._skipped_plugins:
-            if name.find("/") > -1:
-                sans_prefix = name.split("/")[1]
-            else:
-                sans_prefix = name
-            if sans_prefix in plugin_items:
-                plugin_items.remove(sans_prefix)
+            name = self._name_sans_prefix(name)
+            _ = self._remove_if_found(plugin_items, name)
 
         if plugin_items:
             print("\n-----   Unused plugins found   -----")
@@ -304,25 +295,11 @@ class Plugins:
             else:
                 conf_base = os.path.dirname(location)
 
-            if not conf_base:
-                raise SyntaxError(
-                    f"conf_base could not be extracted [{xdg_home}] "
-                    + "[tilde_home_dir({self._conf_file})]"
-                )
-
             plugins_dir = os.path.join(conf_base, "tmux", "plugins")
-            if conf_base:
-                tpm_env = f'XDG_CONFIG_HOME="{conf_base}" '
-            else:
-                tpm_env = ""
+            tpm_env = os.path.expanduser(f'XDG_CONFIG_HOME="{conf_base}" ')
         if plugins_dir[0] not in ("/", "~"):  # TODO: Not windows compatible
             plugins_dir = os.path.join(os.getcwd(), plugins_dir)
 
-        if tpm_env.find("~") > -1:
-            raise SyntaxError(
-                "XDG_CONFIG_HOME can not contain ~ "
-                + "tpm does not bother with expanduser :("
-            )
         return plugins_dir, tpm_env
 
     def mkscript_manual_deploy(self):
@@ -395,6 +372,7 @@ class Plugins:
         tpm_app = os.path.join(tpm_location, "tpm")
 
         run_installed_tpm = f"{tpm_env}{tpm_app}"
+        print(">> is_limited 2", self._is_limited_host)
         if self._is_limited_host:
             run_installed_tpm = f"""#
         #  If you quickly shut down tmux whilst tpm is still running, things
@@ -407,6 +385,8 @@ class Plugins:
         $TMUX_BIN display "Running tpm..."
         {run_installed_tpm}
         $TMUX_BIN display "tpm completed!" """
+        else:
+            print(">> not limited 2")
 
         activate_tpm_sh = [
             f"""
@@ -462,7 +442,7 @@ class Plugins:
         """To minimize risk of some bug causing massive file deletion,
         file path is double checked.
         """
-        plugins_dir = self.get_deploy_dir()
+        plugins_dir = self.get_plugin_dir()
 
         b_suspicious = False
         if "tmux/" not in plugins_dir:
@@ -486,3 +466,14 @@ class Plugins:
                 shutil.rmtree(path)
             except OSError:
                 os.remove(path)
+
+    def _name_sans_prefix(self, name: str) -> str:
+        if name.find("/") > -1:
+            name = name.split("/")[1]
+        return name
+
+    def _remove_if_found(self, lst: list, item: str, warning: str = "") -> str:
+        if item in lst:
+            lst.remove(item)
+            warning = ""
+        return warning
