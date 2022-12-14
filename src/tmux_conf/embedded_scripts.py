@@ -45,10 +45,11 @@ class EmbeddedScripts:
         Where the script should be run, just call run_it() with
         the script name, and code will be generated to call it the right way.
 
-        calling self.run_it('activate_tpm')  will insert code like:
-          run "cut -c3- /home/jaclu/t2/tmux/tmux.conf | sh -s activate_tpm"
+        calling self.run_it('activate_tpm')  will (depending on config file)
+        insert code like:
+          run "cut -c3- /home/jaclu/.tmux.conf | sh -s activate_tpm"
         or:
-          run "/home/jaclu/t2/tmux/scripts/activate_tpm.sh"
+          run "/home/jaclu/.tmux/scripts/activate_tpm.sh"
 
         depending on self._use_embedded_scripts
         """
@@ -75,7 +76,8 @@ class EmbeddedScripts:
 
             #  Make it run able
             f = pathlib.Path(fname)
-            f.chmod(f.stat().st_mode | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH)
+            f.chmod(f.stat().st_mode | stat.S_IEXEC |
+                    stat.S_IXGRP | stat.S_IXOTH)
 
     def run_it(self, scr_name: str, in_bg: bool = False) -> str:
         """Generate the code to run an embedded/external script"""
@@ -146,7 +148,8 @@ class EmbeddedScripts:
     def get_dir(self):
         """Retrieves the location where scripts should be saved"""
         if self._use_embedded_scripts:
-            raise SyntaxError("get_dir() called when use_embedded_scripts is True")
+            raise SyntaxError(
+                "get_dir() called when use_embedded_scripts is True")
 
         if tilde_home_dir(self._conf_file) == "~/.tmux.conf":
             scripts_dir = os.path.expanduser("~/.tmux/scripts")
@@ -160,5 +163,6 @@ class EmbeddedScripts:
             else:
                 conf_base = os.path.dirname(os.path.dirname(conf_file))
 
-            scripts_dir = os.path.expanduser(os.path.join(conf_base, "tmux", "scripts"))
+            scripts_dir = os.path.expanduser(
+                os.path.join(conf_base, "tmux", "scripts"))
         return scripts_dir
