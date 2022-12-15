@@ -7,7 +7,7 @@ Also shows various methods to define plugins
 import sys
 
 try:
-    from tmux_conf.tmux_conf import TmuxConfig
+    from tmux_conf import TmuxConfig
 except ModuleNotFoundError:
     print("Dependency tmux_conf not installed!")
     sys.exit(1)
