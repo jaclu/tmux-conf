@@ -146,7 +146,7 @@ class Plugins:
 
         if self._used_plugins:
             print("\n\t-----   Plugins used   -----")
-            print(f'{"Plugin":<{max_l_name}}|  Min version\n')
+            print(f'{"Plugin":<{max_l_name}}|  Min version')
 
         #
         #  Create list of items in plugins dir
@@ -190,6 +190,7 @@ class Plugins:
                 )
                 print(f"{name:<{max_l_name}} - {info[PLUGIN_VERS_MIN]} {suffix}")
 
+        #  Remove skipped plugins from plugin_items
         for _, name in self._skipped_plugins:
             name = self._name_sans_prefix(name)
             _ = self._remove_if_found(plugin_items, name)
@@ -205,6 +206,9 @@ class Plugins:
         if self._skipped_plugins:
             print()
 
+        #
+        #  List all plugins installed, but not used
+        #
         max_l_v = 0
         self._skipped_plugins.sort()
         for vers, name in self._skipped_plugins:
@@ -297,8 +301,6 @@ class Plugins:
 
             plugins_dir = os.path.join(conf_base, "tmux", "plugins")
             tpm_env = os.path.expanduser(f'XDG_CONFIG_HOME="{conf_base}" ')
-        if plugins_dir[0] not in ("/", "~"):  # TODO: Not windows compatible
-            plugins_dir = os.path.join(os.getcwd(), plugins_dir)
 
         return plugins_dir, tpm_env
 
@@ -372,7 +374,6 @@ class Plugins:
         tpm_app = os.path.join(tpm_location, "tpm")
 
         run_installed_tpm = f"{tpm_env}{tpm_app}"
-        print(">> is_limited 2", self._is_limited_host)
         if self._is_limited_host:
             run_installed_tpm = f"""#
         #  If you quickly shut down tmux whilst tpm is still running, things
@@ -385,8 +386,6 @@ class Plugins:
         $TMUX_BIN display "Running tpm..."
         {run_installed_tpm}
         $TMUX_BIN display "tpm completed!" """
-        else:
-            print(">> not limited 2")
 
         activate_tpm_sh = [
             f"""
@@ -446,8 +445,6 @@ class Plugins:
 
         b_suspicious = False
         if "tmux/" not in plugins_dir:
-            b_suspicious = True
-        elif plugins_dir in ("", "/", os.path.expanduser("~")):
             b_suspicious = True
 
         if b_suspicious:

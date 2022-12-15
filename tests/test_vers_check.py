@@ -24,6 +24,11 @@ def test_vc_low():
     assert vc.is_ok(3.1) is True  # noqa
 
 
+# def test_tc_bin_bad_vers():
+#     t = TmuxConfig(parse_cmd_line=False, conf_file=CONF_FILE)
+#     t.define_tmux_vers("A")
+
+
 def test_vc_low_suffix():
     # conf_file = "~/.tmux.conf"
     vc = VersionCheck("3.1b")

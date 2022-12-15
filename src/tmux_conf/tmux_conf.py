@@ -442,6 +442,7 @@ class TmuxConfig:
         #
         lines: list[str] = []
         for raw_line in cmd.split("\n"):
+            ## print(f">> raw_line [{raw_line}]")
             #
             #  Returns a list of lines. If input contained a -N and notes
             #  are not supported by this tmux, the note is extracted and
@@ -491,9 +492,10 @@ class TmuxConfig:
         parts = line.split("-N")
         pre = parts[0].strip()
         post = parts[1].strip()
+        print(f">> pre [{pre}] [{post}]")
         if not post:
             # Propably an -N at end of line, so not related to a note
-            return [line]
+            return [pre]
         p0 = post[0]
         if p0 in {'"', "'"}:
             end_note = post[1:].find(p0)
@@ -560,8 +562,7 @@ class TmuxConfig:
             self.tmux_bin = cmd
             self.define_tmux_vers()
         else:
-            print(f"ERROR: tmux bin seems invalid: {cmd}")
-            sys.exit(1)
+            sys.exit(f"ERROR: tmux bin seems invalid: {cmd}")
 
     def find_tmux_bin(self, cmd: str = "") -> bool:
         if not cmd:
@@ -662,7 +663,7 @@ class TmuxConfig:
         """Finally try some likely locations"""
         cmd = ""
         for c in (
-            "/usr/local/bin",
+            "/usr/local/bin/tmux",
             "/home/linuxbrew/.linuxbrew/bin/tmux",
             "~/.asdf/shims/tmux",
         ):

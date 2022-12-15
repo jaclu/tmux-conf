@@ -3,7 +3,7 @@ import os
 import pytest
 from src.tmux_conf.embedded_scripts import EmbeddedScripts
 
-from .common_vars import CONF_FILE
+from .utils import CONF_FILE
 
 SCRIPT_NAME = "foo123"
 
@@ -20,15 +20,9 @@ def es_hello_world(conf_file=CONF_FILE, use_embedded_scripts=True, use_bash=Fals
         f"""
 {SCRIPT_NAME}() {{
     echo "Hello world"
-}}
-    """
+}}"""
     ]
-    sh.append(
-        """
-
-
-    """
-    )
+    sh.append("")
     es.create(SCRIPT_NAME, sh, use_bash=use_bash)
     return es
 
@@ -44,6 +38,15 @@ def test_es_relative_conf_file():
     es = es_env(conf_file)
     print(f">> conf_file: {es._conf_file}")
     assert es._conf_file.split("/")[-1] == conf_file
+
+
+def test_es_XDG():
+    os.environ["XDG_CONFIG_HOME"] = "/tmp"
+    es = es_hello_world(use_embedded_scripts=False, use_bash=True)
+    bash_sh = es.run_it(SCRIPT_NAME).split('"')[1]
+    os.environ.pop("XDG_CONFIG_HOME")
+    # Simplify by not caring about path to bash
+    assert get_shebang(bash_sh) == "#!/usr/bin/env bash"
 
 
 def test_es_create_external_bash():

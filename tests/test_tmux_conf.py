@@ -1,35 +1,34 @@
 import os
 
 import pytest
-
 from src.tmux_conf.tmux_conf import TmuxConfig
 from src.tmux_conf.utils import run_shell
 
-from .common_vars import CONF_FILE
+from .utils import CONF_FILE, install_plugins, remove_conf_file, tmux_conf_instance
 
-BIND_CMD = "bind -N 'This is a note'  a  display 'that was a'"
 CONTENT_LINE = "# Hello world"
 PLUGIN_SOURCE = "jaclu"
 PLUGIN_NAME = "tmux-prefix-highlight"
 
 
-class NotEmbedded(TmuxConfig):
+class WithContent(TmuxConfig):
+    tst_content = "# dummy content"
+
+    def content(self):
+        self.write(self.tst_content)
+
+
+class NotEmbedded(WithContent):
     """We combine not embedded and content in the same class.
     They are used for separate tests so they dont overlap,
     just handy to use a single class"""
 
     use_embedded_scripts = False
 
-    def content(self):
-        self.write(CONTENT_LINE)
 
-
-class PluginsSample(TmuxConfig):
+class PluginsSample(WithContent):
     """Test class ensuring plugins are only present at the intended
     versions"""
-
-    def content(self):
-        self.write("# dummy content")
 
     def plugin_prefix_highlight(self):
         #
@@ -77,15 +76,18 @@ class PluginsDuplicated(PluginsSample):
         return [f"{PLUGIN_SOURCE}/{PLUGIN_NAME}", 2.4, conf]
 
 
-def prep_plugin_class(cls, version=2.8):
-    ps = cls(parse_cmd_line=False, conf_file=CONF_FILE, tmux_version=version)
-    ps.plugins.scan(ps.list_plugin_methods())
-    return ps
-
-
 def tc_env(conf_file=CONF_FILE):
     tc = TmuxConfig(parse_cmd_line=False, conf_file=conf_file)
     return tc
+
+
+def prep_plugin_class(cls, version="2.8", plugins_display=0):
+    t = tmux_conf_instance(
+        cls=cls, tmux_version=version, plugins_display=plugins_display
+    )
+    # ps = cls(parse_cmd_line=False, conf_file=CONF_FILE, tmux_version=version)
+    t.plugins.scan(t.list_plugin_methods())
+    return t
 
 
 def test_tc_vers_ok_low():
@@ -109,63 +111,102 @@ def test_tc_is_tmux_bin():
     assert tc.is_tmux_bin("tmux") is True
 
 
-def test_tc_is_not_tmate():
-    tc = tc_env()
-    assert tc.is_tmate() is not True
+def test_tc_parse_cmd_line():
+    remove_conf_file()
+    t = TmuxConfig()
+    with pytest.raises(OSError):
+        t.run()
 
 
-def test_tc_is_tmate():
-    tc = tc_env()
-    #  This assumes there is a tmate in PATH
-    if not (tmate_cmd := run_shell("command -v tmate")):
-        return  # Can't do this test
-    tc.use_tmux_bin(tmate_cmd)
-    assert tc.is_tmate() is True
+def test_tc_content_needs_overloading():
+    t = TmuxConfig(parse_cmd_line=False)
+    with pytest.raises(NotImplementedError) as exc:
+        t.content()
+    assert exc.value.args[0] == "content() must be defined in sub-class!"
 
 
-def not_tc_tmate_get_env():
-    tc = tc_env(conf_file="~/.tmate.conf")
-    #  This assumes there is a tmate in PATH
-    if not (tmate_cmd := run_shell("command -v tmate")):
-        return  # Can't do this test
-    tc.use_tmux_bin(tmate_cmd)
-    plugins_dir, _ = tc.plugins.get_env()
-    assert plugins_dir == f"{os.getenv('HOME')}/.tmate/plugins"
+def test_tc_repeated_calls_to_edit_config_coverage():
+    t = TmuxConfig(parse_cmd_line=False)
+    t.edit_config()
+    t.edit_config()
 
 
-def test_tc_tmate_get_env():
-    tc = tc_env(conf_file="~/.tmate.conf")
-    #  This assumes there is a tmate in PATH
-    if not (tmate_cmd := run_shell("command -v tmate")):
-        return  # Can't do this test
-    tc.use_tmux_bin(tmate_cmd)
-    plugins_dir, _ = tc.plugins.get_env()
-    assert plugins_dir == f"{os.getenv('HOME')}/.tmate/plugins"
+def test_tc_btick():
+    t = tmux_conf_instance(cls=WithContent)
+    t.tst_content = "# one btick `"
+    with pytest.raises(SyntaxError) as exc:
+        t.run()
+    assert exc.value.args[0].find("Un-escaped back-ticks can not be present") > -1
 
 
-def test_tc_filter_note():
+#
+#  Handle notes
+#
+def test_tc_note_unchanged():
+    bind_cmd = "bind -N 'This is a note'  a  display 'that was a'"
     tc = tc_env()
     tc.define_tmux_vers(vers="3.2")
-    assert tc.filter_note(BIND_CMD) == [BIND_CMD]
+    assert tc.filter_note(bind_cmd) == [bind_cmd]
 
 
-def test_tc_filter_note_as_comment():
+def test_tc_note_as_comment():
+    #  Also ensure spaces > 2 after note are disgarded
     tc = tc_env()
     tc.define_tmux_vers(vers="2.8")
-    assert tc.filter_note("bind -N 'This is a note'  a  display 'that was a'") == [
+    assert tc.filter_note("bind -N 'This is a note'    a display 'that was a'") == [
         "",
         "#  This is a note",
-        "bind  a  display 'that was a'",
+        "bind  a display 'that was a'",
     ]
 
 
-def test_tc_filter_note_not_as_comment():
+def test_tc_note_removed():
     tc = tc_env()
     tc.define_tmux_vers(vers="2.8")
     tc.use_notes_as_comments = False
     assert tc.filter_note("bind -N 'This is a note'  a  display 'that was a'") == [
         "bind  a  display 'that was a'"
     ]
+
+
+def test_tc_note_ends_with_N():
+    #  Ensure empty -N is removed
+    tc = tc_env()
+    tc.define_tmux_vers(vers="2.8")
+    assert tc.filter_note("dummy line -N") == ["dummy line"]
+
+
+def test_tc_note_single_word():
+    #  needed for coverage
+    tc = tc_env()
+    tc.define_tmux_vers(vers="2.8")
+    tc.filter_note("dummy line -N notice")
+
+
+def test_tc_note_extra_N_is_purged():
+    #  Ensure extra -N is disgarded
+    note = "missing feature"
+    cmd = "dummy line"
+    cmd_rest = 'M display "mouse toggle needs 2.1"'
+    line = f'{cmd} -N      "{note}" {cmd_rest}'
+    tc = tc_env()
+    tc.define_tmux_vers(vers="2.8")
+    assert tc.filter_note(f'{line} -N "another comment"') == [
+        "",
+        f"#  {note}",
+        f"{cmd} {cmd_rest}",
+    ]
+
+
+#
+#  Conf file
+#
+def test_tc_conf_file_not_replace(capfd):
+    t = TmuxConfig(parse_cmd_line=False, replace_config=False)
+    with pytest.raises(OSError):
+        t.run()
+    out, _ = capfd.readouterr()
+    assert out.find("Do you wish to replace the default config file (y/n)") > -1
 
 
 def test_tc_conf_file_not_embedded():
@@ -217,34 +258,107 @@ def test_tc_conf_file_header_and_content():
     tc.remove_conf_file()
 
 
+#
+#  tmux bin versions
+#
+def test_tc_bin_not_found():
+    bad_tmux = "tmmuxx"
+    with pytest.raises(SyntaxError) as exc:
+        TmuxConfig(parse_cmd_line=False, conf_file=CONF_FILE, tmux_bin=bad_tmux)
+    assert exc.value.args[0] == f"tmux cmd not found: {bad_tmux}"
+
+
+def test_tc_bin_empty():
+    t = TmuxConfig(parse_cmd_line=False, conf_file=CONF_FILE)
+    with pytest.raises(SyntaxError) as exc:
+        t.use_tmux_bin("")
+    assert exc.value.args[0] == "cmd empty"
+
+
+def test_tc_bin_incorrect():
+    wrong_bin = "python"
+    t = TmuxConfig(parse_cmd_line=False, conf_file=CONF_FILE)
+    with pytest.raises(SystemExit) as exc:
+        t.use_tmux_bin(wrong_bin)
+    assert exc.value.args[0] == f"ERROR: tmux bin seems invalid: {wrong_bin}"
+
+
+def test_tc_bin_auto_find():
+    #  coverage
+    t = TmuxConfig(parse_cmd_line=False, conf_file=CONF_FILE)
+    t.define_tmux_vers(tmux_bin="")
+    t.find_cmd_2()
+    t.find_cmd_3()
+
+
+def test_tc_non_default_version():
+    other_version = "4.0"
+    remove_conf_file()
+
+    t = PluginsSample(
+        parse_cmd_line=False,
+        conf_file=CONF_FILE,
+        tmux_version=other_version,
+        plugins_display=3,
+    )
+    with pytest.raises(SystemExit):
+        t.run()
+
+
+def test_tc_too_old_for_plugins(capfd):
+    ancient_vers = "1.0"
+    with pytest.raises(SystemExit):
+        TmuxConfig(parse_cmd_line=False, tmux_version=ancient_vers, plugins_display=1)
+    out, _ = capfd.readouterr()
+    assert out.find("Config has been requested for another version of tmux") > -1
+    assert out.find(f"requested vers:  {ancient_vers}") > -1
+    assert out.find("might give some errors!") > -1
+
+
+#
+#  Working with plugins
+#
 def test_tc_plugin_found():
-    ps = prep_plugin_class(cls=PluginsSample, version=2.4)
-    assert ps.plugins.found() == [PLUGIN_NAME]
-    assert ps.plugins.found(short_name=False) == [f"{PLUGIN_SOURCE}/{PLUGIN_NAME}"]
+    t = prep_plugin_class(cls=PluginsSample, version="2.4")
+    assert t.plugins.found() == [PLUGIN_NAME]
+    assert t.plugins.found(short_name=False) == [f"{PLUGIN_SOURCE}/{PLUGIN_NAME}"]
+
+
+def test_tc_plugin_write():
+    t = prep_plugin_class(cls=PluginsSample)
+    t.run()
+    install_plugins()
+
+
+def test_tc_plugin_display_3():
+    t = prep_plugin_class(cls=PluginsSample, plugins_display=2)
+    with pytest.raises(SystemExit):
+        t.run()
+    # out, _ = capfd.readouterr()
+    # print(f">> out [{out}]")
+    # assert 1 == 2
 
 
 def test_tc_plugin_unavailable():
-    ps = prep_plugin_class(cls=PluginsSample, version=2.0)
-    assert not ps.plugins.found()
-    assert not ps.plugins.found(short_name=False)
+    t = prep_plugin_class(cls=PluginsSample, version="2.0")
+    assert not t.plugins.found()
+    assert not t.plugins.found(short_name=False)
 
 
 def test_tc_plugins_disabled():
-    ps = prep_plugin_class(cls=PluginsDisabled, version=2.4)
-    assert not ps.plugins.found()
-    assert not ps.plugins.found(short_name=False)
+    t = prep_plugin_class(cls=PluginsDisabled, version="2.4")
+    assert not t.plugins.found()
+    assert not t.plugins.found(short_name=False)
 
 
 def test_tc_plugin_duplicate():
     with pytest.raises(SystemExit):
-        prep_plugin_class(cls=PluginsDuplicated, version=2.4)
+        prep_plugin_class(cls=PluginsDuplicated, version="2.4")
 
 
 #
 #  Checks that only plugins of matching version are selected
 #
-
-
 @pytest.mark.parametrize(
     "vers, plugins_expected",
     [
@@ -294,3 +408,44 @@ def test_tc_plugins_parse(plugin_cls):
     ps = prep_plugin_class(cls=plugin_cls)
     output = ps.plugins.parse()
     assert isinstance(output, list)
+
+
+#
+#  tmate tests
+#
+def test_tc_tmate(capfd):
+    TmuxConfig(parse_cmd_line=False, conf_file="~/.tmux.conf", tmux_bin="tmate")
+
+
+def test_tc_is_not_tmate():
+    tc = tc_env()
+    assert tc.is_tmate() is not True
+
+
+def test_tc_is_tmate():
+    tc = tc_env()
+    #  This assumes there is a tmate in PATH
+    if not (tmate_cmd := run_shell("command -v tmate")):
+        return  # Can't do this test
+    tc.use_tmux_bin(tmate_cmd)
+    assert tc.is_tmate() is True
+
+
+def not_tc_tmate_get_env():
+    tc = tc_env(conf_file="~/.tmate.conf")
+    #  This assumes there is a tmate in PATH
+    if not (tmate_cmd := run_shell("command -v tmate")):
+        return  # Can't do this test
+    tc.use_tmux_bin(tmate_cmd)
+    plugins_dir, _ = tc.plugins.get_env()
+    assert plugins_dir == f"{os.getenv('HOME')}/.tmate/plugins"
+
+
+def test_tc_tmate_get_env():
+    tc = tc_env(conf_file="~/.tmate.conf")
+    #  This assumes there is a tmate in PATH
+    if not (tmate_cmd := run_shell("command -v tmate")):
+        return  # Can't do this test
+    tc.use_tmux_bin(tmate_cmd)
+    plugins_dir, _ = tc.plugins.get_env()
+    assert plugins_dir == f"{os.getenv('HOME')}/.tmate/plugins"

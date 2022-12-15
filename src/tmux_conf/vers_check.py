@@ -33,9 +33,8 @@ class VersionCheck:
         v_maj = parts[0]
         try:
             v_min = parts[1]
-        except IndexError as exc:
-            print(f"ERROR: Failed to extract v_min: {self._vers}")
-            raise IndexError from exc
+        except IndexError:
+            raise IndexError(f"ERROR: Failed to extract v_min: {self._vers}")
         try:
             self.v_maj = int(v_maj)
         except ValueError as exc:
