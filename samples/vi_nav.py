@@ -7,7 +7,7 @@ Also shows various methods to define plugins
 import sys
 
 try:
-    from tmux_conf import TmuxConfig
+    from tmux_conf.tmux_conf import TmuxConfig
 except ModuleNotFoundError:
     print("Dependency tmux_conf not installed!")
     sys.exit(1)
@@ -63,7 +63,7 @@ class ViNav(TmuxConfig):
         #
         # case 1: No settings for the plugin
         #
-        return ["tmux-plugins/tmux-yank", 1.9, ""]
+        return ["tmux-plugins/tmux-yank", 99, ""]
 
     def plugin_prefix_highlight(self):
         #
