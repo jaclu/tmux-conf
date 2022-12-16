@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+#
+#  Copyright (c) 2022: Jacob.Lundqvist@gmail.com
+#  License: MIT
+#
+#  Part of https://github.com/jaclu/tmux-conf
+#
 """Sample config, showing how to use settings depending on a recent
 tmux version. And defining some plugins of various complexity
 
