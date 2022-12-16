@@ -1,11 +1,10 @@
 import os
 
 import pytest
-from src.tmux_conf.tmux_conf import TmuxConfig
+from src.tmux_conf import TmuxConfig
 from src.tmux_conf.utils import run_shell
 
-from .utils import (CONF_FILE, install_plugins, remove_conf_file,
-                    tmux_conf_instance)
+from .utils import CONF_FILE, install_plugins, remove_conf_file, tmux_conf_instance
 
 CONTENT_LINE = "# Hello world"
 PLUGIN_SOURCE = "jaclu"
@@ -137,8 +136,7 @@ def test_tc_btick():
     t.tst_content = "# one btick `"
     with pytest.raises(SyntaxError) as exc:
         t.run()
-    assert exc.value.args[0].find(
-        "Un-escaped back-ticks can not be present") > -1
+    assert exc.value.args[0].find("Un-escaped back-ticks can not be present") > -1
 
 
 #
@@ -208,8 +206,7 @@ def test_tc_conf_file_not_replace(capfd):
     with pytest.raises(OSError):
         t.run()
     out, _ = capfd.readouterr()
-    assert out.find(
-        "Do you wish to replace the default config file (y/n)") > -1
+    assert out.find("Do you wish to replace the default config file (y/n)") > -1
 
 
 def test_tc_conf_file_not_embedded():
@@ -267,8 +264,7 @@ def test_tc_conf_file_header_and_content():
 def test_tc_bin_not_found():
     bad_tmux = "tmmuxx"
     with pytest.raises(SyntaxError) as exc:
-        TmuxConfig(parse_cmd_line=False,
-                   conf_file=CONF_FILE, tmux_bin=bad_tmux)
+        TmuxConfig(parse_cmd_line=False, conf_file=CONF_FILE, tmux_bin=bad_tmux)
     assert exc.value.args[0] == f"tmux cmd not found: {bad_tmux}"
 
 
@@ -312,11 +308,9 @@ def test_tc_non_default_version():
 def test_tc_too_old_for_plugins(capfd):
     ancient_vers = "1.0"
     with pytest.raises(SystemExit):
-        TmuxConfig(parse_cmd_line=False,
-                   tmux_version=ancient_vers, plugins_display=1)
+        TmuxConfig(parse_cmd_line=False, tmux_version=ancient_vers, plugins_display=1)
     out, _ = capfd.readouterr()
-    assert out.find(
-        "Config has been requested for another version of tmux") > -1
+    assert out.find("Config has been requested for another version of tmux") > -1
     assert out.find(f"requested vers:  {ancient_vers}") > -1
     assert out.find("might give some errors!") > -1
 
@@ -327,8 +321,7 @@ def test_tc_too_old_for_plugins(capfd):
 def test_tc_plugin_found():
     t = prep_plugin_class(cls=PluginsSample, version="2.4")
     assert t.plugins.found() == [PLUGIN_NAME]
-    assert t.plugins.found(short_name=False) == [
-        f"{PLUGIN_SOURCE}/{PLUGIN_NAME}"]
+    assert t.plugins.found(short_name=False) == [f"{PLUGIN_SOURCE}/{PLUGIN_NAME}"]
 
 
 def test_tc_plugin_write():
@@ -421,8 +414,7 @@ def test_tc_plugins_parse(plugin_cls):
 #  tmate tests
 #
 def test_tc_tmate():
-    TmuxConfig(parse_cmd_line=False,
-               conf_file="~/.tmux.conf", tmux_bin="tmate")
+    TmuxConfig(parse_cmd_line=False, conf_file="~/.tmux.conf", tmux_bin="tmate")
 
 
 def test_tc_is_not_tmate():
