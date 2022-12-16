@@ -4,7 +4,8 @@ import pytest
 from src.tmux_conf.tmux_conf import TmuxConfig
 from src.tmux_conf.utils import run_shell
 
-from .utils import CONF_FILE, install_plugins, remove_conf_file, tmux_conf_instance
+from .utils import (CONF_FILE, install_plugins, remove_conf_file,
+                    tmux_conf_instance)
 
 CONTENT_LINE = "# Hello world"
 PLUGIN_SOURCE = "jaclu"
@@ -419,7 +420,7 @@ def test_tc_plugins_parse(plugin_cls):
 #
 #  tmate tests
 #
-def test_tc_tmate(capfd):
+def test_tc_tmate():
     TmuxConfig(parse_cmd_line=False,
                conf_file="~/.tmux.conf", tmux_bin="tmate")
 
