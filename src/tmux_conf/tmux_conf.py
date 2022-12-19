@@ -492,7 +492,6 @@ class TmuxConfig:
         parts = line.split("-N")
         pre = parts[0].strip()
         post = parts[1].strip()
-        print(f">> pre [{pre}] [{post}]")
         if not post:
             # Propably an -N at end of line, so not related to a note
             return [pre]
