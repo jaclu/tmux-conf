@@ -582,6 +582,9 @@ class TmuxConfig:
             if not self.is_tmux_bin(cmd):
                 print(f"ERROR: asdf tmux does not seem to be valid: {cmd}")
                 sys.exit(1)
+            #
+            #  Convert asdf shim into absolute path
+            #
             cmd_asdf = (
                 f'{cmd.split("shims/")[0]}installs/tmux/'
                 f'{self.vers.get().split("-")[0]}/bin/tmux'
