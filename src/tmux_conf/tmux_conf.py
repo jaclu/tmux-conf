@@ -84,7 +84,8 @@ class TmuxConfig:
     #
     #  Default binary, if non given
     #
-    tmux_bin = "tmux"
+    tmux_bin = os.getenv('TMUX_BIN') or "tmux"
+    #tmux_bin = "tmux"
 
     lib_version = __version__
 
@@ -332,7 +333,6 @@ class TmuxConfig:
         #  how to override the edit key
         #
         self.edit_config()
-
         if self.plugin_handler and self.plugins.found():
             w(
                 """#======================================================
@@ -442,7 +442,6 @@ class TmuxConfig:
         #
         lines: list[str] = []
         for raw_line in cmd.split("\n"):
-            ## print(f">> raw_line [{raw_line}]")
             #
             #  Returns a list of lines. If input contained a -N and notes
             #  are not supported by this tmux, the note is extracted and
@@ -535,7 +534,8 @@ class TmuxConfig:
                 "Do you wish to replace the default config file (y/n)?"
             )
         else:
-            confirmation = input("Do you wish to create a default config file (y/n)?")
+            confirmation = input(
+                "Do you wish to create a default config file (y/n)?")
         if confirmation not in ("y", "Y"):
             print("Terminating...")
             sys.exit(1)
@@ -559,7 +559,7 @@ class TmuxConfig:
         # Do a basic sanity check
         if self.is_tmux_bin(cmd):
             self.tmux_bin = cmd
-            self.define_tmux_vers()
+            self.define_tmux_vers(tmux_bin=cmd)
         else:
             sys.exit(f"ERROR: tmux bin seems invalid: {cmd}")
 
@@ -568,30 +568,11 @@ class TmuxConfig:
             #  Use the first that gives something
             cmd = self.find_cmd_1() or self.find_cmd_2() or self.find_cmd_3()
 
-        if cmd:
-            # the asdf check needs to know what version this is
-            self.use_tmux_bin(cmd)
-        #
-        #  asdf refers to bins via its shim dir, where versions cant be
-        #  identified, since it depends on other ENV variables,
-        #  in this case try to extract a full path to the tmux bin itself,
-        #  but make sure not to expand an asdf path that has already
-        #  been processed!
-        #
-        if cmd.find(".asdf") > -1 and cmd.find("/installs/") < 0:
-            if not self.is_tmux_bin(cmd):
-                print(f"ERROR: asdf tmux does not seem to be valid: {cmd}")
-                sys.exit(1)
-            #
-            #  Convert asdf shim into absolute path
-            #
-            cmd_asdf = (
-                f'{cmd.split("shims/")[0]}installs/tmux/'
-                f'{self.vers.get().split("-")[0]}/bin/tmux'
-            )
-            self.use_tmux_bin(cmd_asdf)
+        self.expand_cmd_path(cmd)
 
-        if not cmd:
+        # ==== 1 =
+
+        if not self.tmux_bin:
             #  tmux not found abort
             print("ERROR could not find tmux binary, aborting")
             sys.exit(1)
@@ -600,7 +581,7 @@ class TmuxConfig:
     def is_tmate(self):
         return self.tmux_bin.find("tmate") > -1
 
-    def is_tmux_bin(self, cmd: str = "") -> bool:
+    def is_tmux_bin(self, cmd: str) -> bool:
         """Only checks if the requested bin seems to be a tmux or tmate,
         checking name and doing simplified version check, ie if
         the second part of version is int"""
@@ -626,7 +607,6 @@ class TmuxConfig:
         if not tmux_bin:
             tmux_bin = self.tmux_bin
         vers_found = run_shell(f"{tmux_bin} -V | cut -d' ' -f2")
-
         self.vers = VersionCheck(vers_found, vers)
 
     #
@@ -651,15 +631,8 @@ class TmuxConfig:
 
     def find_cmd_2(self):
         """Next check PATH"""
-        cmd = ""
-        try:
-            c = run_shell("command -v tmux")
-        except subprocess.CalledProcessError:
-            c = ""
-        if c and c.lower().find("not found") < 0:
-            cmd = c
-            print(f"found {cmd} in PATH")
-        return cmd
+        print(f"find_cmd_2()")
+        return self.full_path_tmux_cmd()
 
     def find_cmd_3(self):
         """Finally try some likely locations"""
@@ -673,6 +646,47 @@ class TmuxConfig:
             if is_executable(c2):
                 cmd = c2
                 break
+        return cmd
+
+    def expand_cmd_path(self, cmd):
+        #
+        #  asdf refers to bins via its shim dir, where versions cant be
+        #  identified, since it depends on other ENV variables,
+        #  in this case try to extract a full path to the tmux bin itself,
+        #  but make sure not to expand an asdf path that has already
+        #  been processed!
+        #  Any process starting in the same dir as tmux was started will
+        #  inherrit potential local asdf tmux selection, but processes
+        #  starting in other dirs will use asdf default version.
+        #  By expanding the initial shim into a full version,
+        #  the correct tmux will be used in all instances.
+        #
+        if cmd:
+            # the asdf check needs to know what version this is
+            self.use_tmux_bin(cmd)
+        # get full path notation for tmux
+        cmd = self.full_path_cmd(cmd)
+        if cmd.find(".asdf") > -1 and cmd.find("/installs/") < 0:
+            if not self.is_tmux_bin(cmd):
+                print(f"ERROR: asdf tmux does not seem to be valid: {cmd}")
+                sys.exit(1)
+            #
+            #  Convert asdf shim into absolute path
+            #
+            cmd_asdf = (
+                f'{cmd.split("shims/")[0]}installs/tmux/'
+                f'{self.vers.get().split("-")[0]}/bin/tmux'
+            )
+            self.use_tmux_bin(cmd_asdf)
+
+    def full_path_cmd(self, cmd="tmux"):
+        try:
+            c = run_shell(f"command -v {cmd}")
+        except subprocess.CalledProcessError:
+            c = ""
+        if c and c.lower().find("not found") < 0:
+            cmd = c
+            print(f"found {cmd} in PATH")
         return cmd
 
     def remove_conf_file(self):

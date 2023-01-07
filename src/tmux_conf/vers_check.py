@@ -63,7 +63,8 @@ class VersionCheck:
         try:
             a, b = v.split(".")
         except ValueError as exc:
-            print(f"ERROR: vers_ok({v}) - bad syntax, expected maj.min notation!")
+            print(
+                f"ERROR: vers_ok({v}) - bad syntax, expected maj.min notation!")
             raise ValueError from exc
 
         try:
