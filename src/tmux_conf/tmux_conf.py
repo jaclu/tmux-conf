@@ -631,7 +631,7 @@ class TmuxConfig:
     def find_cmd_2(self):
         """Next check PATH"""
         print(f"find_cmd_2()")
-        return self.full_path_tmux_cmd()
+        return self.full_path_cmd()
 
     def find_cmd_3(self):
         """Finally try some likely locations"""
