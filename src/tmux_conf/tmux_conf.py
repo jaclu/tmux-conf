@@ -85,7 +85,6 @@ class TmuxConfig:
     #  Default binary, if non given
     #
     tmux_bin = os.getenv('TMUX_BIN') or "tmux"
-    #tmux_bin = "tmux"
 
     lib_version = __version__
 
