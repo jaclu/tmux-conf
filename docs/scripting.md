@@ -64,7 +64,7 @@ I prefer to use embedded scripts, this ensures that no out of date
 scripts hang around in scripts/ and eliminates risk of scripts not found
 if they are deleted, but either is valid so entirely up to you.
 
-##  Background scripts
+## Background scripts
 
 If the script is intended to run in the background add the param in_bg=True
 
