@@ -69,7 +69,7 @@ class ViNav(TmuxConfig):
         #
         # case 1: No settings for the plugin
         #
-        return ["tmux-plugins/tmux-yank", 99, ""]
+        return ["tmux-plugins/tmux-yank", 1.5, ""]
 
     def plugin_prefix_highlight(self):
         #
