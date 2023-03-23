@@ -111,6 +111,9 @@ def test_tc_is_tmux_bin():
     assert tc.is_tmux_bin("tmux") is True
 
 
+#
+#  Cant be run inside VSCod ATM...
+#
 def test_tc_parse_cmd_line():
     remove_conf_file()
     t = TmuxConfig()
@@ -276,7 +279,7 @@ def test_tc_bin_empty():
 
 
 def test_tc_bin_incorrect():
-    wrong_bin = "python"
+    wrong_bin = "python3"  # must exist even if not tmux...
     t = TmuxConfig(parse_cmd_line=False, conf_file=CONF_FILE)
     with pytest.raises(SystemExit) as exc:
         t.use_tmux_bin(wrong_bin)
