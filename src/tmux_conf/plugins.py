@@ -256,7 +256,6 @@ class Plugins:
         #  Add plugin references and hard coded plugin settings.
         #
         for name, info in self._used_plugins.items():
-
             output.append("#------------------------------")
             output.append(f'set -g @plugin "{name}"')
             for line in info[2].split("\n"):
@@ -459,10 +458,7 @@ class Plugins:
         for file_name in os.listdir(plugins_dir):
             path = os.path.join(plugins_dir, file_name)
             print(f"removing plugin {file_name}")
-            try:
-                shutil.rmtree(path)
-            except OSError:
-                os.remove(path)
+            shutil.rmtree(path)
 
     def _name_sans_prefix(self, name: str) -> str:
         if name.find("/") > -1:
