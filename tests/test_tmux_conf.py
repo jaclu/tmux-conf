@@ -1,4 +1,5 @@
 import os
+import shutil
 
 import pytest
 from src.tmux_conf import TmuxConfig
@@ -209,7 +210,45 @@ def test_tc_conf_file_not_replace(capfd):
     with pytest.raises(OSError):
         t.run()
     out, _ = capfd.readouterr()
-    assert out.find("Do you wish to replace the default config file (y/n)") > -1
+    assert out.find("Do you wish to replace the default config file (y/n)?") > -1
+
+
+def test_tc_conf_file_create_default(capfd):
+    def_conf_file = os.path.expanduser("~/.tmux.conf")
+    tmp_conf_file = os.path.expanduser("~/.tmux.conf.orig")
+    if os.path.exists(def_conf_file):
+        if os.path.exists(tmp_conf_file):
+            #  Ensure we start with an empty file
+            os.remove(tmp_conf_file)
+        shutil.move(def_conf_file, tmp_conf_file)
+
+    t = TmuxConfig(parse_cmd_line=False)
+    with pytest.raises(OSError):
+        t.run()
+    out, _ = capfd.readouterr()
+    if os.path.exists(tmp_conf_file):
+        shutil.move(tmp_conf_file, def_conf_file)
+    assert out.find("Do you wish to create a default config file (y/n)?") > -1
+
+
+def test_tc_conf_file_no_write(capfd):
+    cf_file = "/var/root/foo/tmux.conf"
+    with pytest.raises(OSError):
+        t = TmuxConfig(parse_cmd_line=False, conf_file=cf_file)
+        t.run()
+    out, _ = capfd.readouterr()
+    assert (
+        out.find("ERROR: read only file system reported") > -1
+        or out.find("ERROR: Could not write to config file") > -1
+    )
+
+
+def test_tc_conf_file_not_replace_other_conf(capfd):
+    t = TmuxConfig(parse_cmd_line=False, conf_file=CONF_FILE)
+    with pytest.raises(OSError):
+        t.run()
+    out, _ = capfd.readouterr()
+    assert out.find(f"Do you wish to replace {CONF_FILE} (y/n)?") > -1
 
 
 def test_tc_conf_file_not_embedded():
@@ -333,13 +372,19 @@ def test_tc_plugin_write():
     install_plugins()
 
 
-def test_tc_plugin_display_3():
+def test_tc_plugin_display_2():
     t = prep_plugin_class(cls=PluginsSample, plugins_display=2)
     with pytest.raises(SystemExit):
         t.run()
     # out, _ = capfd.readouterr()
     # print(f">> out [{out}]")
     # assert 1 == 2
+
+
+def test_tc_plugin_display_3():
+    t = prep_plugin_class(cls=PluginsSample, plugins_display=3)
+    with pytest.raises(SystemExit):
+        t.run()
 
 
 def test_tc_plugin_unavailable():
