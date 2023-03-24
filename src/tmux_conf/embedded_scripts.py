@@ -26,7 +26,6 @@ class EmbeddedScripts:
     """Handles scripts, either embedded or stored in scripts/ as external"""
 
     def __init__(self, conf_file: str, use_embedded_scripts: bool):
-
         #  Ensure conf file is using ~ or full path if ~ not applicable
         conf_file = tilde_home_dir(conf_file)
         if conf_file[0] not in ("~", "/"):
@@ -90,7 +89,7 @@ class EmbeddedScripts:
                 if not self._bash_shell:
                     self._bash_shell = (
                         subprocess.run(
-                            ["which", "bash"],
+                            ["command", "-v", "bash"],
                             stdout=subprocess.PIPE,
                             check=True,
                         )
