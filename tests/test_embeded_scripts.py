@@ -19,8 +19,12 @@ def es_hello_world(conf_file=CONF_FILE, use_embedded_scripts=True, use_bash=Fals
     sh = [
         f"""
 {SCRIPT_NAME}() {{
+
     echo "Hello world"
-}}"""
+
+}}
+
+"""
     ]
     sh.append("")
     es.create(SCRIPT_NAME, sh, use_bash=use_bash)
@@ -92,7 +96,7 @@ def test_es_content():
     errors = []
     if cont[1] != f"# {SCRIPT_NAME}() {{":
         errors.append(f"Bad script name line: {cont[1]}")
-    if cont[2] != '#     echo "Hello world"':
+    if cont[3] != '#     echo "Hello world"':
         errors.append(f"Bad echo: {cont[2]}")
     assert not errors, "errors occured:\n{}".format("\n".join(errors))
 
