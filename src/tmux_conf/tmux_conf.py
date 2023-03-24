@@ -38,7 +38,6 @@ from .vers_check import VersionCheck
 
 
 class TmuxConfig:
-
     #
     #  I have forked a tpm that uses TPM_BIN to use the right tmux
     #  context. If you just use one version of tmux, this does not
@@ -84,7 +83,7 @@ class TmuxConfig:
     #
     #  Default binary, if non given
     #
-    tmux_bin = os.getenv('TMUX_BIN') or "tmux"
+    tmux_bin = os.getenv("TMUX_BIN") or "tmux"
 
     lib_version = __version__
 
@@ -455,22 +454,15 @@ class TmuxConfig:
             for line in self.filter_note(raw_line.strip()):
                 lines.append(line)
 
-        if self._write_stdout:
-            #
-            #  Used for displaying plugin settings
-            #
+        with open(self.conf_file, "a", encoding="utf-8") as f:
             for line in lines:
-                print(line)
-        else:
-            with open(self.conf_file, "a", encoding="utf-8") as f:
-                for line in lines:
-                    if self.use_embedded_scripts and (btick_unescaped(line)):
-                        raise SyntaxError(
-                            "Un-escaped back-ticks can not be present in "
-                            + "the generated config when\n"
-                            + "embedded_scripts are used!"
-                        )
-                    f.write(f"{line}{eol}")
+                if self.use_embedded_scripts and (btick_unescaped(line)):
+                    raise SyntaxError(
+                        "Un-escaped back-ticks can not be present in "
+                        + "the generated config when\n"
+                        + "embedded_scripts are used!"
+                    )
+                f.write(f"{line}{eol}")
 
     def filter_note(self, line: str):
         """Returns list of lines, if notes are not supported
@@ -533,8 +525,7 @@ class TmuxConfig:
                 "Do you wish to replace the default config file (y/n)?"
             )
         else:
-            confirmation = input(
-                "Do you wish to create a default config file (y/n)?")
+            confirmation = input("Do you wish to create a default config file (y/n)?")
         if confirmation not in ("y", "Y"):
             print("Terminating...")
             sys.exit(1)
@@ -679,10 +670,7 @@ class TmuxConfig:
             self.use_tmux_bin(cmd_asdf)
 
     def full_path_cmd(self, cmd="tmux"):
-        try:
-            c = run_shell(f"command -v {cmd}")
-        except subprocess.CalledProcessError:
-            c = ""
+        c = run_shell(f"command -v {cmd}")
         if c and c.lower().find("not found") < 0:
             cmd = c
             print(f"found {cmd} in PATH")
