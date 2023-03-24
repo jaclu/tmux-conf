@@ -31,10 +31,7 @@ class VersionCheck:
         #
         parts = self._vers.split(".")
         v_maj = parts[0]
-        try:
-            v_min = parts[1]
-        except IndexError:
-            raise IndexError(f"ERROR: Failed to extract v_min: {self._vers}")
+        v_min = parts[1]
         try:
             self.v_maj = int(v_maj)
         except ValueError as exc:
@@ -59,18 +56,12 @@ class VersionCheck:
         param is needed. Internally version refs are allways treated as
         strings.
         """
-        v = self.normalize_vers(vers)
-        try:
-            a, b = v.split(".")
-        except ValueError as exc:
-            print(
-                f"ERROR: vers_ok({v}) - bad syntax, expected maj.min notation!")
-            raise ValueError from exc
+        a, b = self.normalize_vers(vers).split(".")
 
         try:
             vers_maj = int(a)
         except ValueError as exc:
-            print(f"ERROR: vers_ok({v}) - maj part not int!")
+            print(f"ERROR: vers_ok({vers}) - maj part not int!")
             raise ValueError from exc
 
         vers_min, suffix = self.get_sub_vers(b)
@@ -83,7 +74,7 @@ class VersionCheck:
         r = True
         if vers_min > self.v_min:
             r = False
-        elif suffix > self.v_suffix:
+        elif vers_min == self.v_min and suffix > self.v_suffix:
             r = False
         return r
 
@@ -104,10 +95,24 @@ class VersionCheck:
     def normalize_vers(self, vers) -> str:
         """Normalizes vers into a string"""
         # param fixes
+        if isinstance(vers, str) and vers.find(".") < 0:
+            try:
+                vers = int(vers)
+            except ValueError as err:
+                print(f"ERROR: vers_check normalize_vers({vers}) bad param")
+                raise ValueError from err
         if isinstance(vers, int):
             vers = f"{vers}.0"
         elif isinstance(vers, float):
             vers = f"{vers}"
         #  correct , -> .
         vers = vers.replace(",", ".")
-        return vers
+        #
+        #  Only keep first two items
+        #
+        parts = vers.split(".")
+        # if len(parts) > 2:
+        #     raise ValueError(f"ERROR: normalize_vers({vers}) > 2 parts")
+        if len(parts) < 2:
+            raise ValueError(f"ERROR: normalize_vers({vers}) < 2 parts")
+        return ".".join(parts[:2])
