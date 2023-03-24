@@ -151,7 +151,7 @@ def verify_conf_file_usable(conf_file: str) -> str:
         print("ERROR: Could not create directory for config file!")
         raise PermissionError from error
     except OSError as error:
-        print(f"ERRPR: read only file system reported for {conf_file}")
+        print(f"ERROR: read only file system reported for {conf_file}")
         raise OSError from error
 
     #  Ensure it can be written to
