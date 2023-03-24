@@ -48,7 +48,10 @@ def plugins_env(conf_file=CONF_FILE, plugins_display=0):
     vc = VersionCheck(3.0)
     es = EmbeddedScripts(conf_file=conf_file, use_embedded_scripts=True)
     plugins = Plugins(
-        conf_file=conf_file, vers_class=vc, es_class=es, plugins_display=plugins_display
+        conf_file=conf_file,
+        vers_class=vc,
+        es_class=es,
+        plugins_display=plugins_display,
     )
     return plugins
 
@@ -101,13 +104,13 @@ def test_p_get_plugin_dir_xdg():
     assert plugin_dir.find(xdg_location) > -1
 
 
-def test_p_manual_header():
+def test_p_manual_handler():
     plugins = plugins_env()
     cont = plugins.mkscript_manual_deploy()
     assert cont[0].find("Manual Plugin Handling") > -1
 
 
-def test_p_tpm_header():
+def test_p_tpm_handler():
     plugins = plugins_env()
     cont = plugins.mkscript_tpm_deploy()
     assert cont[0].find("Tmux Plugin Manager") > -1

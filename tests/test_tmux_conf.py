@@ -113,13 +113,16 @@ def test_tc_is_tmux_bin():
 
 
 #
-#  Cant be run inside VSCod ATM...
+#  Cant be run inside VSCode ATM...
 #
-def test_tc_parse_cmd_line():
-    remove_conf_file()
-    t = TmuxConfig()
-    with pytest.raises(OSError):
-        t.run()
+cfb = os.environ.get("__CFBundleIdentifier")
+if not cfb or cfb.find("VSCode") < 0:
+
+    def test_tc_parse_cmd_line():
+        remove_conf_file()
+        t = TmuxConfig()
+        with pytest.raises(OSError):
+            t.run()
 
 
 def test_tc_content_needs_overloading():

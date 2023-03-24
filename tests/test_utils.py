@@ -114,6 +114,11 @@ def test_utils_tilde_home_dir():
     assert utils.tilde_home_dir(full_path) == tilde_name
 
 
+def test_utils_not_tilde_home_dir():
+    full_path = "/tmp"
+    assert utils.tilde_home_dir(full_path) == full_path
+
+
 def test_utils_conf_file_useable_empty():
     with pytest.raises(SyntaxError):
         utils.verify_conf_file_usable("")

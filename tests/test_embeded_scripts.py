@@ -37,6 +37,11 @@ def get_shebang(fname):
     return line.strip()
 
 
+def test_es_no_plugins_should_return_empty():
+    es = es_env()
+    assert isinstance(es.content(), list)
+
+
 def test_es_relative_conf_file():
     conf_file = "dummy_conf"
     es = es_env(conf_file)
