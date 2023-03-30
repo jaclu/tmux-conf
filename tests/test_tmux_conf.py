@@ -241,7 +241,7 @@ def test_tc_conf_file_no_write(capfd):
         t.run()
     out, _ = capfd.readouterr()
     assert (
-        out.find("ERROR: read only file system reported") > -1
+        out.find("ERROR: Could not create directory for config file!") > -1
         or out.find("ERROR: Could not write to config file") > -1
     )
 
@@ -480,16 +480,6 @@ def test_tc_is_tmate():
         return  # Can't do this test
     tc.use_tmux_bin(tmate_cmd)
     assert tc.is_tmate() is True
-
-
-def not_tc_tmate_get_env():
-    tc = tc_env(conf_file="~/.tmate.conf")
-    #  This assumes there is a tmate in PATH
-    if not (tmate_cmd := run_shell("command -v tmate")):
-        return  # Can't do this test
-    tc.use_tmux_bin(tmate_cmd)
-    plugins_dir, _ = tc.plugins.get_env()
-    assert plugins_dir == f"{os.getenv('HOME')}/.tmate/plugins"
 
 
 def test_tc_tmate_get_env():
