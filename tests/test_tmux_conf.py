@@ -237,8 +237,10 @@ def test_tc_conf_file_create_default(capfd):
 
 def test_tc_conf_file_no_write(capfd):
     if os.path.isdir("/proc/ish"):
-        # iSH doesn't have propper file privs, so will allow user writes
-        # to /root only printing a warning t
+        #
+        #  iSH doesn't have propper file privs, so will allow user writes
+        #  to read only paths
+        #
         pytest.skip("skipping test not working on iSH")
 
     cf_file = "/var/root/foo/tmux.conf"
