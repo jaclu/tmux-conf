@@ -16,7 +16,6 @@
 
 import os
 import shutil
-import subprocess  # nosec
 import sys
 from collections.abc import Callable
 from datetime import datetime
@@ -621,7 +620,7 @@ class TmuxConfig:
 
     def find_cmd_2(self):
         """Next check PATH"""
-        print(f"find_cmd_2()")
+        print("find_cmd_2()")
         return self.full_path_cmd()
 
     def find_cmd_3(self):
@@ -665,7 +664,7 @@ class TmuxConfig:
             #
             cmd_asdf = (
                 f'{cmd.split("shims/")[0]}installs/tmux/'
-                f'{self.vers.get().split("-")[0]}/bin/tmux'
+                f'{self.vers.get().split("-",maxsplit=1)[0]}/bin/tmux'
             )
             self.use_tmux_bin(cmd_asdf)
 
