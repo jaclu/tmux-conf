@@ -1,8 +1,8 @@
 import os
 import shutil
+import subprocess
 
 import pytest
-
 from src.tmux_conf import TmuxConfig
 from src.tmux_conf.utils import run_shell
 
@@ -238,7 +238,7 @@ def test_tc_conf_file_create_default(capfd):
 def test_tc_conf_file_no_write(capfd):
     if os.path.isdir("/proc/ish"):
         # iSH doesn't have propper file privs, so will allow user writes
-        # to /root ...
+        # to /root only printing a warning t
         pytest.skip("skipping test not working on iSH")
 
     cf_file = "/var/root/foo/tmux.conf"
@@ -471,7 +471,9 @@ def test_tc_plugins_parse(plugin_cls):
 #  tmate tests
 #
 def test_tc_tmate():
-    TmuxConfig(parse_cmd_line=False, conf_file="~/.tmux.conf", tmux_bin="tmate")
+    if not (tmate_cmd := run_shell("command -v tmate")):
+        pytest.skip("tmate not found")
+    TmuxConfig(parse_cmd_line=False, conf_file="~/.tmux.conf", tmux_bin=tmate_cmd)
 
 
 def test_tc_is_not_tmate():
@@ -483,7 +485,7 @@ def test_tc_is_tmate():
     tc = tc_env()
     #  This assumes there is a tmate in PATH
     if not (tmate_cmd := run_shell("command -v tmate")):
-        return  # Can't do this test
+        pytest.skip("tmate not found")
     tc.use_tmux_bin(tmate_cmd)
     assert tc.is_tmate() is True
 
