@@ -15,11 +15,10 @@
 import os
 import pathlib
 import stat
-import subprocess
 import sys
 
 from .constants import XDG_CONFIG_HOME
-from .utils import tilde_home_dir
+from .utils import run_shell, tilde_home_dir
 
 
 class EmbeddedScripts:
@@ -75,8 +74,7 @@ class EmbeddedScripts:
 
             #  Make it run able
             f = pathlib.Path(fname)
-            f.chmod(f.stat().st_mode | stat.S_IEXEC |
-                    stat.S_IXGRP | stat.S_IXOTH)
+            f.chmod(f.stat().st_mode | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH)
 
     def run_it(self, scr_name: str, in_bg: bool = False) -> str:
         """Generate the code to run an embedded/external script"""
@@ -88,19 +86,9 @@ class EmbeddedScripts:
             cmd += f"cut -c3- {self._conf_file} | "
             if scr_name in self._bash_scripts:
                 if not self._bash_shell:
-                    self._bash_shell = (
-                        subprocess.run(
-                            # ["command", "-v", "bash"],
-                            ["which", "bash"],
-                            stdout=subprocess.PIPE,
-                            check=True,
-                        )
-                        .stdout.decode("utf-8")
-                        .strip()
-                    )
-                    if not self._bash_shell:
+                    if not (bash_shell := run_shell("command -v bash")):
                         sys.exit("Failed to find bash!")
-
+                    self._bash_shell = bash_shell
                 cmd += self._bash_shell
             else:
                 cmd += "sh"
@@ -148,8 +136,7 @@ class EmbeddedScripts:
     def get_dir(self):
         """Retrieves the location where scripts should be saved"""
         if self._use_embedded_scripts:
-            raise SyntaxError(
-                "get_dir() called when use_embedded_scripts is True")
+            raise SyntaxError("get_dir() called when use_embedded_scripts is True")
 
         if tilde_home_dir(self._conf_file) == "~/.tmux.conf":
             scripts_dir = os.path.expanduser("~/.tmux/scripts")
@@ -163,6 +150,5 @@ class EmbeddedScripts:
             else:
                 conf_base = os.path.dirname(os.path.dirname(conf_file))
 
-            scripts_dir = os.path.expanduser(
-                os.path.join(conf_base, "tmux", "scripts"))
+            scripts_dir = os.path.expanduser(os.path.join(conf_base, "tmux", "scripts"))
         return scripts_dir
