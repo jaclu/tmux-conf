@@ -1,6 +1,5 @@
 import os
 import shutil
-import subprocess
 
 import pytest
 from src.tmux_conf import TmuxConfig
