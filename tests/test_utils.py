@@ -1,4 +1,5 @@
 import os
+import tempfile
 from pathlib import Path
 from stat import S_IREAD, S_IWRITE
 
@@ -115,8 +116,8 @@ def test_utils_tilde_home_dir():
 
 
 def test_utils_not_tilde_home_dir():
-    full_path = "/tmp"
-    assert utils.tilde_home_dir(full_path) == full_path
+    tmp_dir = tempfile.mkdtemp()
+    assert utils.tilde_home_dir(tmp_dir) == tmp_dir
 
 
 def test_utils_conf_file_useable_empty():
@@ -141,10 +142,9 @@ def test_utils_conf_file_useable_readonly_fs():
 
 
 def test_utils_conf_file_useable_readonly_file():
-    conf_ro_file = "/tmp/foo123.conf"
-    Path(conf_ro_file).touch()
-    os.chmod(conf_ro_file, S_IREAD)
+    conf_ro_file = tempfile.NamedTemporaryFile()
+    Path(conf_ro_file.name).touch()
+    os.chmod(conf_ro_file.name, S_IREAD)
     with pytest.raises(IOError):
-        utils.verify_conf_file_usable(conf_ro_file)
-    os.chmod(conf_ro_file, S_IWRITE)
-    os.remove(conf_ro_file)
+        utils.verify_conf_file_usable(conf_ro_file.name)
+    os.chmod(conf_ro_file.name, S_IWRITE)
