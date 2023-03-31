@@ -140,4 +140,4 @@ def test_vc_normalize_vers():
 
 def test_vc_vers_bad_init():
     with pytest.raises(ValueError):
-        vc = VersionCheck("qwerty")
+        VersionCheck("qwerty")
