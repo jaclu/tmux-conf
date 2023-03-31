@@ -2,6 +2,7 @@ import os
 import shutil
 
 import pytest
+
 from src.tmux_conf import TmuxConfig
 from src.tmux_conf.utils import run_shell
 
@@ -235,6 +236,11 @@ def test_tc_conf_file_create_default(capfd):
 
 
 def test_tc_conf_file_no_write(capfd):
+    if os.path.isdir("/proc/ish"):
+        # iSH doesn't have propper file privs, so will allow user writes
+        # to /root ...
+        pytest.skip("skipping test not working on iSH")
+
     cf_file = "/var/root/foo/tmux.conf"
     with pytest.raises(OSError):
         t = TmuxConfig(parse_cmd_line=False, conf_file=cf_file)
@@ -257,7 +263,7 @@ def test_tc_conf_file_not_replace_other_conf(capfd):
 def test_tc_conf_file_not_embedded():
     tc = NotEmbedded(parse_cmd_line=False, conf_file=CONF_FILE)
     tc.conf_file_header()
-    with open(os.path.expanduser(CONF_FILE), encoding="utf-8") as f:
+    with open(os.path.expanduser(CONF_FILE), "r", encoding="utf-8") as f:
         line = f.readline()  # Just get 1st line
     assert line == "#\n"
     tc.remove_conf_file()
