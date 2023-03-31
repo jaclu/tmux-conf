@@ -5,7 +5,7 @@ import pytest
 from src.tmux_conf import TmuxConfig
 from src.tmux_conf.utils import run_shell
 
-from .utils import CONF_FILE, install_plugins, remove_conf_file, tmux_conf_instance
+from .utils_test import CONF_FILE, install_plugins, remove_conf_file, tmux_conf_instance
 
 CONTENT_LINE = "# Hello world"
 PLUGIN_SOURCE = "jaclu"

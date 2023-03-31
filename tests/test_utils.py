@@ -6,7 +6,7 @@ from stat import S_IREAD, S_IWRITE
 import pytest
 from src.tmux_conf import utils
 
-from .utils import CONF_FILE
+from .utils_test import CONF_FILE
 
 
 @pytest.mark.parametrize(

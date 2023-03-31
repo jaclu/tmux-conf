@@ -8,7 +8,7 @@ from src.tmux_conf.plugins import Plugins
 from src.tmux_conf.tmux_conf import TmuxConfig
 from src.tmux_conf.vers_check import VersionCheck
 
-from .utils import CONF_FILE, PLUGINS_DIR, install_plugins, tmux_conf_instance
+from .utils_test import CONF_FILE, PLUGINS_DIR, install_plugins, tmux_conf_instance
 
 
 class PluginUnsafePluginDir(Plugins):
