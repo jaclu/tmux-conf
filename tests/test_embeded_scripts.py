@@ -2,8 +2,9 @@ import os
 
 import pytest
 from src.tmux_conf.embedded_scripts import EmbeddedScripts
+from src.tmux_conf.utils import run_shell
 
-from .utils import CONF_FILE
+from .utils_test import CONF_FILE
 
 SCRIPT_NAME = "foo123"
 
@@ -50,6 +51,8 @@ def test_es_relative_conf_file():
 
 
 def test_es_XDG():
+    if not run_shell("command -v bash"):
+        pytest.skip("No bash found")
     os.environ["XDG_CONFIG_HOME"] = "/tmp"
     es = es_hello_world(use_embedded_scripts=False, use_bash=True)
     bash_sh = es.run_it(SCRIPT_NAME).split('"')[1]
@@ -59,6 +62,8 @@ def test_es_XDG():
 
 
 def test_es_create_external_bash():
+    if not run_shell("command -v bash"):
+        pytest.skip("No bash found")
     es = es_hello_world(use_embedded_scripts=False, use_bash=True)
     bash_sh = es.run_it(SCRIPT_NAME).split('"')[1]
     # Simplify by not caring about path to bash
@@ -67,9 +72,8 @@ def test_es_create_external_bash():
 
 def test_es_create_external_sh():
     es = es_hello_world(use_embedded_scripts=False)
-    bash_sh = es.run_it(SCRIPT_NAME).split('"')[1]
-    # Simplify by not caring about path to bash
-    assert get_shebang(bash_sh) == "#!/bin/sh"
+    shell_used = es.run_it(SCRIPT_NAME).split('"')[1]
+    assert get_shebang(shell_used) == "#!/bin/sh"
 
 
 def test_es_run_it_posix():
@@ -78,6 +82,9 @@ def test_es_run_it_posix():
 
 
 def test_es_run_it_bash():
+    if not run_shell("command -v bash"):
+        pytest.skip("No bash found")
+
     es = es_hello_world(use_bash=True)
     s = es.run_it(SCRIPT_NAME)
     # Simplify by not caring about path to bash
