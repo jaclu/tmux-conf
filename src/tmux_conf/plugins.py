@@ -169,12 +169,14 @@ class Plugins:
 
         for name, info in self._used_plugins.items():
             if verbose:
-                name = self._name_sans_prefix(name)
+                inner_name = self._name_sans_prefix(name)
                 suffix = self._remove_if_found(
-                    plugin_items, name, " *** Not installed ***"
+                    plugin_items, inner_name, " *** Not installed ***"
                 )
-                print("".ljust(len(name) + 2, "-"))
-                print(f"> {name:<{max_l_name - 2}} - {info[PLUGIN_VERS_MIN]} {suffix}")
+                print("".ljust(len(inner_name) + 2, "-"))
+                print(
+                    f"> {inner_name:<{max_l_name - 2}} - {info[PLUGIN_VERS_MIN]} {suffix}"
+                )
                 info[PLUGIN_MTHD]()
                 #
                 #  Skip indention, for easier read
@@ -184,16 +186,16 @@ class Plugins:
                     print(f"{line.strip()}")
                 # print()
             else:
-                name = self._name_sans_prefix(name)
+                inner_name = self._name_sans_prefix(name)
                 suffix = self._remove_if_found(
-                    plugin_items, name, " *** Not installed ***"
+                    plugin_items, inner_name, " *** Not installed ***"
                 )
-                print(f"{name:<{max_l_name}} - {info[PLUGIN_VERS_MIN]} {suffix}")
+                print(f"{inner_name:<{max_l_name}} - {info[PLUGIN_VERS_MIN]} {suffix}")
 
         #  Remove skipped plugins from plugin_items
         for _, name in self._skipped_plugins:
-            name = self._name_sans_prefix(name)
-            _ = self._remove_if_found(plugin_items, name)
+            inner_name = self._name_sans_prefix(name)
+            _ = self._remove_if_found(plugin_items, inner_name)
 
         if plugin_items:
             print("\n-----   Unused plugins found   -----")
