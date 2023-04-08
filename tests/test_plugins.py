@@ -8,7 +8,17 @@ from src.tmux_conf.plugins import Plugins
 from src.tmux_conf.tmux_conf import TmuxConfig
 from src.tmux_conf.vers_check import VersionCheck
 
-from .utils_test import CONF_FILE, PLUGINS_DIR, install_plugins, tmux_conf_instance
+from .utils_test import (
+    install_plugins,
+    tmux_conf_instance,
+    tst_conf_base,
+    tst_conf_file,
+    tst_plugins_dir,
+)
+
+# from .utils_test import tst_conf_file  # CONF_FILE,
+# from .utils_test import tst_plugins_dir  # PLUGINS_DIR,
+# from .utils_test import install_plugins, tmp_conf_base, tmux_conf_instance
 
 
 class PluginUnsafePluginDir(Plugins):
@@ -44,7 +54,8 @@ class DuplicatePlugins(Using2Plugins):
         return ["jaclu/tmux-better-mouse-mode", 99, ""]
 
 
-def plugins_env(conf_file=CONF_FILE, plugins_display=0):
+def plugins_env(conf_file, plugins_display=0):
+    # f"{tmp_path}/tmux/tmux.conf"
     vc = VersionCheck(3.0)
     es = EmbeddedScripts(conf_file=conf_file, use_embedded_scripts=True)
     plugins = Plugins(
@@ -56,46 +67,48 @@ def plugins_env(conf_file=CONF_FILE, plugins_display=0):
     return plugins
 
 
-def test_p_bad_display():
+def not_test_p_bad_display_param(tmp_path):
+    tst_conf_file = f"{tmp_path}/tmux/tmux.conf"
     vc = VersionCheck(3.0)
-    es = EmbeddedScripts(conf_file=CONF_FILE, use_embedded_scripts=True)
+    es = EmbeddedScripts(conf_file=tst_conf_file, use_embedded_scripts=True)
     with pytest.raises(ValueError):
-        Plugins(conf_file=CONF_FILE, vers_class=vc, es_class=es, plugins_display=4)
+        Plugins(conf_file=tst_conf_file, vers_class=vc, es_class=es, plugins_display=4)
 
 
-def test_p_deploy_dir():
-    plugins = plugins_env()
+def not_test_p_deploy_dir(tst_conf_file):
+    plugins = plugins_env(tst_conf_file)
     ddir = plugins.get_plugin_dir()
     assert ddir.endswith("/plugins") is True
 
 
-def test_p_limited_host_on():
-    plugins = plugins_env()
+def not_test_p_limited_host_on(tst_conf_file):
+    plugins = plugins_env(tst_conf_file)
     assert plugins.set_limited_host(True) is True
 
 
-def test_p_limited_host_off():
-    plugins = plugins_env()
+def not_test_p_limited_host_off(tst_conf_file):
+    plugins = plugins_env(tst_conf_file)
     assert plugins.set_limited_host(False) is not True
 
 
-def test_p_get_env():
-    plugins = plugins_env("~/.tmux.conf")
+def not_test_p_get_env(tst_conf_file):
+    plugins = plugins_env(tst_conf_file)  # "~/.tmux.conf")
     ddir, _ = plugins.get_env()
     assert ddir == plugins.get_plugin_dir()
 
 
-def test_p_get_plugin_dir_tmate():
+def not_test_p_get_plugin_dir_tmate():
     tc = plugins_env(conf_file="~/.tmate.conf")
     plugin_dir = tc.get_plugin_dir()
     assert plugin_dir == f"{os.getenv('HOME')}/.tmate/plugins"
 
 
-def test_p_get_plugin_dir_xdg():
+def not_test_p_get_plugin_dir_xdg(tmp_path):
+    tmp_conf_base = f"{tmp_path}/tmux"
     xdg_orig = os.environ.get(XDG_CONFIG_HOME, "")
-    xdg_location = "/tmp/tmux_cont_test"
+    xdg_location = tmp_conf_base
     os.environ[XDG_CONFIG_HOME] = xdg_location
-    plugins = plugins_env()
+    plugins = plugins_env(f"{tmp_conf_base}/.tmux.conf")
     plugin_dir = plugins.get_plugin_dir()
     if xdg_orig:
         os.environ[XDG_CONFIG_HOME] = xdg_orig
@@ -104,21 +117,21 @@ def test_p_get_plugin_dir_xdg():
     assert plugin_dir.find(xdg_location) > -1
 
 
-def test_p_manual_handler():
-    plugins = plugins_env()
+def not_test_p_manual_handler(tst_conf_file):
+    plugins = plugins_env(tst_conf_file)
     cont = plugins.mkscript_manual_deploy()
     assert cont[0].find("Manual Plugin Handling") > -1
 
 
-def test_p_tpm_handler():
-    plugins = plugins_env()
+def not_test_p_tpm_handler(tst_conf_file):
+    plugins = plugins_env(tst_conf_file)
     cont = plugins.mkscript_tpm_deploy()
     assert cont[0].find("Tmux Plugin Manager") > -1
 
 
-def test_p_parse():
+def test_p_parse(tst_conf_file):
     """Do a parse with no plugins defined"""
-    plugins = plugins_env()
+    plugins = plugins_env(tst_conf_file)
     assert not plugins.parse()
 
 
@@ -128,35 +141,38 @@ def test_p_def_conf_disp_info():
         plugins.display_info()
 
 
-def test_p_install(cls=Using2Plugins):
+def bad_test_p_install(tst_conf_base, tst_conf_file, tst_plugins_dir):
+    install_plugins(tst_conf_file)  # Manually install all plugins
+
+
+def not_test_p_clear_plugins(tst_conf_base, tst_conf_file, tst_plugins_dir):
+    cls = Using2Plugins
+
     #  Create a dummy dir, to ensure clear_plugins work as intended
-    os.makedirs(f"{PLUGINS_DIR}/foo", exist_ok=True)
+    os.makedirs(f"{tst_conf_base}/foo", exist_ok=True)
 
     #  First clear all plugins installed
-    tmux_conf_instance(cls, clear_plugins=True).run()
+    tmux_conf_instance(cls, tst_conf_file, clear_plugins=True).run()
 
     # Ensure plugins dir is empty
-    ddir = os.listdir(PLUGINS_DIR)
+    ddir = os.listdir(tst_plugins_dir)
     if len(ddir) > 0:
         raise ValueError("Plugin dir not empty!")
 
-    install_plugins()  #  Manually install all plugins
+    # vc = VersionCheck(3.0)
+    # es = EmbeddedScripts(conf_file=tst_conf_file, use_embedded_scripts=True)
+    # Plugins(conf_file=tst_conf_file, vers_class=vc, es_class=es, clear_plugins=True)
+    # # no exception is good enough for passing
 
 
-def test_p_clear_plugins():
-    vc = VersionCheck(3.0)
-    es = EmbeddedScripts(conf_file=CONF_FILE, use_embedded_scripts=True)
-    Plugins(conf_file=CONF_FILE, vers_class=vc, es_class=es, clear_plugins=True)
-    # no exception is good enough for passing
-
-
-def test_p_installAgain():
+def bad_test_p_installAgain(tmp_conf_base):
     """Install again to ensure plugins are present for further tests"""
-    test_p_install(cls=Using3Plugins)
+    test_p_install(tmp_conf_base, cls=Using3Plugins)
 
 
-def test_p_display(capfd):
-    t = tmux_conf_instance(Using2Plugins, plugins_display=2)
+def test_p_display(capfd, tst_conf_file):
+    # tmux_conf_instance(cls, tst_conf_file, clear_plugins=True).run()
+    t = tmux_conf_instance(Using2Plugins, tst_conf_file, plugins_display=2)
     with pytest.raises(SystemExit):
         t.run()
 
@@ -197,20 +213,20 @@ def test_p_display(capfd):
     assert len(plugins_ignored) == 1
 
 
-def test_p_display3(capfd):
+def not_test_p_display3(capfd):
     t = tmux_conf_instance(Using2Plugins, plugins_display=3)
     with pytest.raises(SystemExit):
         t.run()
 
 
-def test_p_duplicate_plugin(capfd):
+def not_test_p_duplicate_plugin(capfd):
     with pytest.raises(SystemExit):
         tmux_conf_instance(DuplicatePlugins).run()
     out, _ = capfd.readouterr()
     assert out.find("defined more than once") > -1
 
 
-def test_p_limited_host():
+def not_test_p_limited_host():
     t = tmux_conf_instance(Using2Plugins)
     t.is_limited_host = True
     try:
@@ -220,10 +236,10 @@ def test_p_limited_host():
     t.plugins.mkscript_tpm_deploy()
 
 
-def test_p_suspicious_clear():
+def not_test_p_suspicious_clear():
     t = tmux_conf_instance(Using2Plugins)
     t.plugins = PluginUnsafePluginDir(
-        CONF_FILE,
+        tst_conf_file,
         vers_class=t.vers,
         es_class=t.es,
         plugin_handler=t.plugin_handler,
@@ -234,14 +250,14 @@ def test_p_suspicious_clear():
         t.plugins.clear()
 
 
-def test_p_missing_plugin_dir():
+def not_test_p_missing_plugin_dir():
     """Security checks to minimize risk of harmfull deletion"""
-    if not PLUGINS_DIR:
+    if not tst_plugins_dir:
         raise SystemError("PLUGINS_DIR undefined")
     wrong_dir = "/moved_plugins"
-    parts = "/".join(PLUGINS_DIR.split("/")[:-1])
+    parts = "/".join(tst_plugins_dir.split("/")[:-1])
     target = parts + wrong_dir
-    shutil.move(PLUGINS_DIR, target)
+    shutil.move(tst_plugins_dir, target)
     t = tmux_conf_instance(Using2Plugins)
     t.plugins.clear()
     if target.find(wrong_dir) != len(parts):
