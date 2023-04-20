@@ -48,6 +48,7 @@ for p in sys.path:
         shutil.copy(f"{DIR_SRC}/tmux_conf.py", dir_dest)
         shutil.copy(f"{DIR_SRC}/utils.py", dir_dest)
         shutil.copy(f"{DIR_SRC}/vers_check.py", dir_dest)
+        shutil.copy(f"{DIR_SRC}/exceptions.py", dir_dest)
         print(f"Copied tmux_conf files to user {dir_dest}")
         sys.exit(0)
 
