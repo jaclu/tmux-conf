@@ -86,8 +86,7 @@ class EmbeddedScripts:
             cmd += f"cut -c3- {self._conf_file} | "
             if scr_name in self._bash_scripts:
                 if not self._bash_shell:
-                    bash_shell = run_shell("command -v bash")
-                    if not (bash_shell):
+                    if not (bash_shell := run_shell("command -v bash")):
                         sys.exit("Failed to find bash!")
                     self._bash_shell = bash_shell
                 cmd += self._bash_shell
