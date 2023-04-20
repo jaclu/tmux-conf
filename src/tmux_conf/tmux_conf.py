@@ -83,7 +83,7 @@ class TmuxConfig:
     #
     #  Default binary, if non given
     #
-    tmux_bin = os.getenv("TMUX_BIN") or "tmux"
+    tmux_bin = "tmux"
 
     lib_version = __version__
 
@@ -526,7 +526,8 @@ class TmuxConfig:
                 "Do you wish to replace the default config file (y/n)?"
             )
         else:
-            confirmation = input("Do you wish to create a default config file (y/n)?")
+            confirmation = input(
+                "Do you wish to create a default config file (y/n)?")
         if confirmation not in ("y", "Y"):
             print("Terminating...")
             sys.exit(1)
@@ -602,14 +603,16 @@ class TmuxConfig:
         """
         parts = run_shell(f"{tmux_bin} -V").split(" ")
         if len(parts) != 2 or parts[0] not in ("tmux", "tmate"):
-            raise TmuxConfNotTmuxCommand("{tmux} Doesnt seem to be a tmux binary")
+            raise TmuxConfNotTmuxCommand(
+                "{tmux} Doesnt seem to be a tmux binary")
         #
         #  Ensure version generated for a previous tmux bin is not still
         #  arround
         #
         self.vers = None
 
-        vers = VersionCheck(actual_vers=parts[1], requested_vers=requested_vers)
+        vers = VersionCheck(
+            actual_vers=parts[1], requested_vers=requested_vers)
         # except TmuxConfInvalidTmuxVersion:
         #     print("{parts[[1]} Doesnt seem to be a valid tmux version")
         #     return False
