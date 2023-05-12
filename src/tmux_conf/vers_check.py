@@ -97,8 +97,12 @@ class VersionCheck:
         # param fixes
 
         if vers == "next-3.4":
-            # make new pre 3.4 vers name compatible with our logic
-            vers = "3.4.next"
+            #
+            #  Alpine tmux-3.3a_git20230428 reports version as next-3.4
+            #  Change this into 3.3a-git20230428, so that notation follows
+            #  the normal logic, and can be used in vers checks
+            #
+            vers = "3.3a-git20230428"
 
         if isinstance(vers, str) and vers.find(".") < 0:
             try:
