@@ -95,6 +95,11 @@ class VersionCheck:
     def normalize_vers(self, vers) -> str:
         """Normalizes vers into a string"""
         # param fixes
+
+        if vers == "next-3.4":
+            # make new pre 3.4 vers name compatible with our logic
+            vers = "3.4.next"
+
         if isinstance(vers, str) and vers.find(".") < 0:
             try:
                 vers = int(vers)

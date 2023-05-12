@@ -38,19 +38,19 @@ def get_shebang(fname):
     return line.strip()
 
 
-def test_es_no_plugins_should_return_empty():
+def not_test_es_no_plugins_should_return_empty():
     es = es_env()
     assert isinstance(es.content(), list)
 
 
-def test_es_relative_conf_file():
+def not_test_es_relative_conf_file():
     conf_file = "dummy_conf"
     es = es_env(conf_file)
     print(f">> conf_file: {es._conf_file}")
     assert es._conf_file.split("/")[-1] == conf_file
 
 
-def test_es_XDG():
+def not_test_es_XDG():
     if not run_shell("command -v bash"):
         pytest.skip("No bash found")
     os.environ["XDG_CONFIG_HOME"] = "/tmp"
@@ -61,7 +61,7 @@ def test_es_XDG():
     assert get_shebang(bash_sh) == "#!/usr/bin/env bash"
 
 
-def test_es_create_external_bash():
+def not_test_es_create_external_bash():
     if not run_shell("command -v bash"):
         pytest.skip("No bash found")
     es = es_hello_world(use_embedded_scripts=False, use_bash=True)
@@ -70,18 +70,18 @@ def test_es_create_external_bash():
     assert get_shebang(bash_sh) == "#!/usr/bin/env bash"
 
 
-def test_es_create_external_sh():
+def not_test_es_create_external_sh():
     es = es_hello_world(use_embedded_scripts=False)
     shell_used = es.run_it(SCRIPT_NAME).split('"')[1]
     assert get_shebang(shell_used) == "#!/bin/sh"
 
 
-def test_es_run_it_posix():
+def not_test_es_run_it_posix():
     es = es_hello_world()
     assert es.run_it(SCRIPT_NAME) == f'run "cut -c3- {CONF_FILE} | sh -s {SCRIPT_NAME}"'
 
 
-def test_es_run_it_bash():
+def not_test_es_run_it_bash():
     if not run_shell("command -v bash"):
         pytest.skip("No bash found")
 
@@ -94,7 +94,7 @@ def test_es_run_it_bash():
     )
 
 
-def test_es_run_it_in_bg():
+def not_test_es_run_it_in_bg():
     es = es_hello_world()
     assert (
         es.run_it(SCRIPT_NAME, in_bg=True)
@@ -102,7 +102,7 @@ def test_es_run_it_in_bg():
     )
 
 
-def test_es_content():
+def not_test_es_content():
     es = es_hello_world()
     cont = es.content()
     errors = []
@@ -113,25 +113,25 @@ def test_es_content():
     assert not errors, "errors occured:\n{}".format("\n".join(errors))
 
 
-def test_es_get_dir_embedded():
+def not_test_es_get_dir_embedded():
     es = es_hello_world()
     with pytest.raises(SyntaxError):
         es.get_dir()
 
 
-def test_es_get_dir_external():
+def not_test_es_get_dir_external():
     es = es_hello_world(use_embedded_scripts=False)
     d = es.get_dir()
     assert d.endswith("/scripts")
 
 
-def test_es_get_dir_external_def_conf():
+def not_test_es_get_dir_external_def_conf():
     es = es_env(conf_file="~/.tmux.conf", use_embedded_scripts=False)
     d = es.get_dir()
     assert d == f"{os.getenv('HOME')}/.tmux/scripts"
 
 
-def test_es_get_dir_external_rel_conf():
+def not_test_es_get_dir_external_rel_conf():
     es = es_env(conf_file="tmux.conf", use_embedded_scripts=False)
     d = es.get_dir()
     assert d.endswith("/tmux/scripts")

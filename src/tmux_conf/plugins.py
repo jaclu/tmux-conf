@@ -216,6 +216,7 @@ class Plugins:
         for vers, name in self._skipped_plugins:
             max_l_v = max(max_l_v, len(vers))
         print("-----   Plugins ignored   -----")
+        #  TODO: space after Min
         print(f'{"Min":<{max_l_v}}|{" Plugin name":<{max_l_name}}')
         print(f'{"vers":<{max_l_v}}|\n')
         for vers, name in self._skipped_plugins:

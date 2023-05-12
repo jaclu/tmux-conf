@@ -29,9 +29,10 @@ a.reverse()
 SP = "site-packages"
 
 for p in sys.path:
-    if p.find(os.getenv("HOME") or "") < 0:
+    if p == "":  # p.find(os.getenv("HOME") or "") < 0:
         continue
     if len(p) - len(SP) == p.rfind(SP):
+        print(f"Checking {p}")
         # chdir to this location to make relative paths work
         os.chdir(os.path.dirname(__main__.__file__))
 
@@ -48,7 +49,11 @@ for p in sys.path:
         shutil.copy(f"{DIR_SRC}/tmux_conf.py", dir_dest)
         shutil.copy(f"{DIR_SRC}/utils.py", dir_dest)
         shutil.copy(f"{DIR_SRC}/vers_check.py", dir_dest)
+        shutil.copy(f"{DIR_SRC}/exceptions.py", dir_dest)
         print(f"Copied tmux_conf files to user {dir_dest}")
         sys.exit(0)
+    else:
+        print(f"Skipping {p}")
+
 
 print(f"ERROR: could not find a user {SP}!")
