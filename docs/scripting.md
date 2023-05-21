@@ -35,7 +35,8 @@ composed of either strings or multi-line strings to `self.es.create()`
 ```
 
 The reason the script is expected to be a list of strings, is to make it
-easier to add lines depending on conditionals.
+easier to add lines depending on conditionals in case you need to do a version
+check or similar.
 
 ## Calling scripts
 
