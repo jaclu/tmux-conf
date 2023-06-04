@@ -28,8 +28,8 @@ a.reverse()
 
 SP = "site-packages"
 
-for p in sys.path:
-    if p == "":  # p.find(os.getenv("HOME") or "") < 0:
+for p in sys.path[:-1]:
+    if p.find(os.getenv("HOME") or "") < 0:
         continue
     if len(p) - len(SP) == p.rfind(SP):
         print(f"Checking {p}")
