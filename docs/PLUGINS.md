@@ -54,6 +54,11 @@ def plugin_packet_loss(self):
 
 ```
 
+## Really old tmux versions
+
+tpm requires version 1.9, for older versions if a plugin handler is
+defined, it is changed into manual. This should work on any tmux.
+
 ## Sample config
 
 This is taken from samples/vi_nav.py and displays the most important concepts.

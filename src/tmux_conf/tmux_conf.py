@@ -172,14 +172,11 @@ class TmuxConfig:
         #  If current tmux is too old to handle tpm plugins,
         #  disable plugins entirely
         #
-        if not self.vers_ok("1.9"):
-            self.plugin_handler = ""
-            if plugins_display > 0:
-                print("Printed something")
-                sys.exit(
-                    "Versions < 1.9 does not support tpm, "
-                    + "so plugin info can not be displayed"
-                )
+        if not self.vers_ok("1.9") and self.plugin_handler:
+            # tpm not available before 1.9, since it was defined, ensure
+            # this is set to manual
+            self.plugin_handler = "manual"
+
         self.plugins = Plugins(
             conf_file=self.conf_file,
             vers_class=self.vers,
