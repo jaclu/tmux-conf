@@ -144,7 +144,7 @@ class TmuxConfig:
         # self.define_tmux_vers()
 
         self.find_tmux_bin(tmux_bin, requested_vers=tmux_version)
-        if tmux_version and (tmux_version != self.vers.get()):
+        if tmux_version and (tmux_version != self.vers.get()):  # type: ignore
             # self.define_tmux_vers(tmux_version)
             if not self.is_tmate():
                 #
@@ -156,8 +156,8 @@ class TmuxConfig:
                     + " than the one used to generate this.\n"
                     + "Since the config file will point to the tmux used, "
                     + "this might cause problems\n"
-                    + f"\ttmux vers is:    {self.vers.get_actual()}\n"
-                    + f"\trequested vers:  {self.vers.get()}"
+                    + f"\ttmux vers is:    {self.vers.get_actual()}\n"  # type: ignore
+                    + f"\trequested vers:  {self.vers.get()}"  # type: ignore
                 )
                 print()
                 print("WARNING: Running this config with the current tmux")
@@ -179,7 +179,7 @@ class TmuxConfig:
 
         self.plugins = Plugins(
             conf_file=self.conf_file,
-            vers_class=self.vers,
+            vers_class=self.vers,  # type: ignore
             es_class=self.es,
             plugin_handler=self.plugin_handler,
             clear_plugins=clear_plugins,
@@ -286,7 +286,7 @@ class TmuxConfig:
     #
     # ================================================================
     def vers_ok(self, vers) -> bool:
-        return self.vers.is_ok(vers)
+        return self.vers.is_ok(vers)  # type: ignore
 
     # ================================================================
     #
@@ -366,7 +366,7 @@ class TmuxConfig:
         self._write_stdout = False
         self.write_enable(True)
 
-        print(f"Writing tmux {self.vers.get()} config to {self.conf_file}")
+        print(f"Writing tmux {self.vers.get()} config to {self.conf_file}")  # type: ignore
 
         w = self.write
         if self.use_embedded_scripts:
@@ -388,11 +388,11 @@ class TmuxConfig:
         #        Source file: {__main__.__file__}
         # """
         )
-        if self.vers.get() != self.vers.get_actual():
-            w(f"#     actual version: ({self.vers.get_actual()})")
+        if self.vers.get() != self.vers.get_actual():  # type: ignore
+            w(f"#     actual version: ({self.vers.get_actual()})")  # type: ignore
+        w(f"#   For tmux version: {self.vers.get()}")  # type: ignore
         w(
-            f"""#   For tmux version: {self.vers.get()}
-        #
+            f"""#
         #  Since this is a compiled config file, please examine $TMUX_SOURCE
         #  for what generated this. That is the right place for any changes
         #  and to examine comments about what is generated and why.
@@ -640,7 +640,7 @@ class TmuxConfig:
             #
             cmd_asdf = (
                 f'{cmd.split("shims/")[0]}installs/tmux/'
-                f'{self.vers.get().split("-",maxsplit=1)[0]}/bin/tmux'
+                f'{self.vers.get().split("-",maxsplit=1)[0]}/bin/tmux'  # type: ignore
             )
             self.use_tmux_bin(cmd_asdf)
 
@@ -656,67 +656,5 @@ class TmuxConfig:
             #  Ensure we start with an empty file
             os.remove(self.conf_file)
 
-    # def extract_tmux_vers(self, vers_str_in):
-    #     parts = vers_str_in.split(".")
-    #     if len(parts) != 2:
-    #         raise TmuxConfInvalidTmuxVersion("Version string is not two parts separated by '.'")
-    #     try:
-    #         maj = int(parts[0])
-    #     except ValueError as exc:
-    #         raise TmuxConfInvalidTmuxVersion(
-    #             f"First part of version string is not int: {parts[0]}"
-    #         ) from exc
-
-    #     #  loop over parts[1] as long as each char is an int, then
-    #     #  ensure next char is a-z
-    #     return maj, min
-
-    # def use_tmux_bin(self, cmd: str):
-    #     """Verify this is a valid tmux, and store its path & version
-
-    #     self.tmux_bin   The tmux used
-    #     self.tmux_vers  The version used
-
-    #     """
-    #     # Do a basic sanity check
-    #     if self.is_tmux_bin(cmd):
-    #         self.tmux_bin = cmd
-    #         self.define_tmux_vers(tmux_bin=cmd)
-    #     else:
-    #         sys.exit(f"ERROR: tmux bin seems invalid: {cmd}")
-
     def is_tmate(self):
         return self.tmux_bin.find("tmate") > -1
-
-    # def is_tmux_bin(self, cmd: str) -> bool:
-    #     """Only checks if the requested bin seems to be a tmux or tmate,
-    #     checking name and doing simplified version check, ie if
-    #     the second part of version is int"""
-    #     if not cmd:
-    #         raise SyntaxError("cmd empty")
-    #     c = shutil.which(cmd)
-    #     if not c:
-    #         raise SyntaxError(f"tmux cmd not found: {cmd}")
-    #     cmd = c
-    #     output = run_shell(f"{cmd} -V")
-    #     name, v = output.split()
-    #     if name not in ("tmux", "tmate"):
-    #         return False
-    #     # i, _ = self.vers.get_sub_vers(v.split(".")[1])
-    #     i = v.split(".")[0]
-    #     try:
-    #         int(i)
-    #     except ValueError:
-    #         return False
-    #     return True
-
-    # #  TODO: use a better name
-    # def define_tmux_vers(self, vers="", tmux_bin: str = "tmux"):
-    #     if not tmux_bin:
-    #         tmux_bin = self.tmux_bin
-    #     vers_found = run_shell(f"{tmux_bin} -V | cut -d' ' -f2")
-    #     if not vers_found:
-    #         raise FileNotFoundError(
-    #             f"tmux: [{tmux_bin}] does not seem to be a tmux bin"
-    #         )
-    #     self.vers = VersionCheck(vers_found, vers)
