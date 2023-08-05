@@ -33,12 +33,24 @@ class EmbeddedScripts:
 
         self._use_embedded_scripts = use_embedded_scripts
         self._scripts: list[str] = []
+        self.defined_scripts = []
         self._bash_scripts: list[str] = []
         self._bash_shell = ""  # Will only be set if needed
 
-    def create(self, scr_name: str, script, use_bash=False):
+    def create(
+        self,
+        scr_name: str,
+        script: list[str],
+        use_bash: bool = False,
+        built_in: bool = False,
+    ):
         """Creates a script, supplied as a list of lines
         script lines can be regular lines as string, or multi-line strings
+
+        built_in is set to True for scripts generated in this pip
+        then it is checked if such a script has already been created by
+        code using this, and if the scr_name has been used, this instance
+        of it is skipped
 
         Where the script should be run, just call run_it() with
         the script name, and code will be generated to call it the right way.
@@ -51,6 +63,12 @@ class EmbeddedScripts:
 
         depending on self._use_embedded_scripts
         """
+        if built_in is False:
+            self.defined_scripts.append(scr_name)
+        else:
+            #  Allow users to override default scripts
+            if scr_name in self.defined_scripts:
+                return
         if self._use_embedded_scripts:
             if use_bash:
                 self._bash_scripts.append(scr_name)
@@ -110,8 +128,7 @@ class EmbeddedScripts:
         #======================================================
         #
         # EMBEDDED-SCRIPTS-STARTING-POINT
-        #
-        """
+        #"""
         ]
         #
         #  Embedded scripts starts at column 3, insert extra indention on
