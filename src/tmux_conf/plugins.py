@@ -424,7 +424,7 @@ class Plugins:
     $TMUX_BIN display "Plugin setup completed"
 }}""",
         ]
-        self._es.create(self._fnc_activate_tpm, activate_tpm_sh)
+        self._es.create(self._fnc_activate_tpm, activate_tpm_sh, built_in=True)
         return output
 
     def clear(self):
