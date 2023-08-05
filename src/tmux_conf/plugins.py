@@ -375,20 +375,6 @@ class Plugins:
         tpm_location = os.path.join(plugins_dir, "tpm")
         tpm_app = os.path.join(tpm_location, "tpm")
 
-        run_installed_tpm = f"{tpm_env}{tpm_app}"
-        if self._is_limited_host:
-            run_installed_tpm = f"""#
-        #  If you quickly shut down tmux whilst tpm is still running, things
-        #  can go wrong. On all normal systems, this is so instantaneous,
-        #  that it is not an issue, but on slow systems, this can take
-        #  a noticeable time, up to five seconds when running iSH for example,
-        #  so in such cases try to wait to exit until after "tpm completed!"
-        #  has been announced.
-        #
-        $TMUX_BIN display "Running tpm..."
-        {run_installed_tpm}
-        $TMUX_BIN display "tpm completed!" """
-
         activate_tpm_sh = [
             f"""
 {self._fnc_activate_tpm}() {{
@@ -396,7 +382,7 @@ class Plugins:
     #  Initialize already installed tpm if found
     #
     if [ -x "{tpm_app}" ]; then
-        {run_installed_tpm}
+        {tpm_env}{tpm_app}
         exit 0
     fi
 
