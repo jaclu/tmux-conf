@@ -14,11 +14,12 @@
 #
 
 
+# from datetime import datetime
+import datetime
 import os
 import shutil
 import sys
 from collections.abc import Callable
-from datetime import datetime
 
 import __main__
 
@@ -330,7 +331,7 @@ class TmuxConfig:
         for line in self.es.content():
             self.write(line)
 
-    def list_plugin_methods(self) -> list[Callable[[], list[str]]]:
+    def list_plugin_methods(self):  # -> list[Callable[[], list[str]]]:
         """Support for plugins.py, provides a list of all plugin_... methods"""
         plugin_mthds: list[Callable[[], list[str]]] = []
         if self.plugin_handler:
@@ -368,7 +369,7 @@ class TmuxConfig:
         #  This config was created using
         #      https://github.com/jaclu/tmux-conf
         #
-        #      Creation time: {datetime.now().strftime("%y-%m-%d %H:%M:%S")}
+        #      Creation time: {datetime.datetime.now().strftime("%y-%m-%d %H:%M:%S")}
         #          tmux-conf: {self.lib_version}
         #         Created on: {run_shell('hostname').strip()}"""
         )
@@ -448,7 +449,7 @@ class TmuxConfig:
                     )
                 f.write(f"{line}{eol}")
 
-    def filter_note(self, line: str) -> list[str]:
+    def filter_note(self, line: str):
         """Returns list of lines, if notes are not supported
         first an empty spacer line, then the note as a comment,
         and finally the actual command without the note

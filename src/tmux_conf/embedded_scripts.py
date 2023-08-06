@@ -24,7 +24,7 @@ from .utils import run_shell, tilde_home_dir
 class EmbeddedScripts:
     """Handles scripts, either embedded or stored in scripts/ as external"""
 
-    def __init__(self, conf_file: str, use_embedded_scripts: bool):
+    def __init__(self, conf_file, use_embedded_scripts):
         #  Ensure conf file is using ~ or full path if ~ not applicable
         conf_file = tilde_home_dir(conf_file)
         if conf_file[0] not in ("~", "/"):
@@ -32,15 +32,15 @@ class EmbeddedScripts:
         self._conf_file = conf_file
 
         self._use_embedded_scripts = use_embedded_scripts
-        self._scripts: list[str] = []
+        self._scripts = []
         self.defined_scripts = []
-        self._bash_scripts: list[str] = []
+        self._bash_scripts = []
         self._bash_shell = ""  # Will only be set if needed
 
     def create(
         self,
         scr_name: str,
-        script: list[str],
+        script,
         use_bash: bool = False,
         built_in: bool = False,
     ) -> None:
@@ -117,7 +117,7 @@ class EmbeddedScripts:
         cmd += '"'
         return cmd
 
-    def content(self) -> list[str]:
+    def content(self):
         """Generates the code for embedded scripts to be written to
         the conf file"""
         if not (self._use_embedded_scripts and self._scripts):

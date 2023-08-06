@@ -45,7 +45,7 @@ def is_executable(cmd: str) -> bool:
     return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
 
 
-def parse_cmdline(args: list[str]):
+def parse_cmdline(args):
     parser = argparse.ArgumentParser(
         description="This tmux conf compiler generates configs for tmux "
         + "versions 1.5 and up."

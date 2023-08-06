@@ -78,7 +78,7 @@ class VersionCheck:
             r = False
         return r
 
-    def get_sub_vers(self, v2: str) -> tuple[int, str]:
+    def get_sub_vers(self, v2: str):
         int_part = ""
         for c in v2:
             try:
