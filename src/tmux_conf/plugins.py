@@ -347,7 +347,10 @@ class Plugins:
 }}""",
         ]
         self._es.create(
-            self._fnc_activate_manually, activate_manually_sh, use_bash=True
+            self._fnc_activate_manually,
+            activate_manually_sh,
+            use_bash=True,
+            built_in=True,
         )
         return output
 
@@ -370,7 +373,6 @@ class Plugins:
         plugins_dir, tpm_env = self.get_env()
         tpm_location = os.path.join(plugins_dir, "tpm")
         tpm_app = os.path.join(tpm_location, "tpm")
-        ind_tpm_working = "@tpm-working-indicator"
         activate_tpm_sh = [
             f"""
 {self._fnc_activate_tpm}() {{
@@ -378,9 +380,7 @@ class Plugins:
     #  Initialize already installed tpm if found
     #
     if [ -x "{tpm_app}" ]; then
-        $TMUX_BIN set-environment -g  {ind_tpm_working} 1
         {tpm_env}{tpm_app}
-        $TMUX_BIN set-environment -gu {ind_tpm_working}
         exit 0
     fi
 
