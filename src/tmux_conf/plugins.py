@@ -109,7 +109,7 @@ class Plugins:
         self._is_limited_host = is_limited
         return self._is_limited_host
 
-    def scan(self, plugin_methods) -> None:
+    def scan(self, plugin_methods: list[Callable[[], list[str]]]) -> None:
         """Investigate all defined plugin methods, and determine if a
         given plugin can be used depending on running tmux"""
         duplicate_check = []

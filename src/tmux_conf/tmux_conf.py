@@ -89,7 +89,7 @@ class TmuxConfig:
         #  if parse_cmd_line is True all other parameters are ignored
         #
         conf_file: str = "~/.tmux.conf",  # where to store conf file
-        tmux_bin: str = "tmux",  #  Default binary, if none given
+        tmux_bin: str = "tmux",  # Default binary, if none given
         tmux_version: str = "",
         replace_config: bool = False,  # replace config with no prompt
         clear_plugins: bool = False,  # remove all current plugins
