@@ -51,19 +51,19 @@ class TmuxConfig:
     #  set this to 'jaclu/tpm' if you want to try that one!
     #  set it to '' if you do not want to use tpm at all.
     #
-    plugin_handler = "tmux-plugins/tpm"
+    plugin_handler: str = "tmux-plugins/tpm"
 
     #
     #  If true and tmux is < 3.1 thus not supporting -N bind notes
     #  this extracts the note and inserts it before the line as a comment.
     #  If false, the note is just discarded.
     #
-    use_notes_as_comments = True
+    use_notes_as_comments: bool = True
 
     #
     #  If false, scripts are saved in scripts/ inside the tmux conf dir
     #
-    use_embedded_scripts = True
+    use_embedded_scripts: bool = True
 
     #
     #  Indicates if this host is low on performance, don't enable
@@ -78,14 +78,9 @@ class TmuxConfig:
     #
     #  Other usages of this is up to implementation classes
     #
-    is_limited_host = False
+    is_limited_host: bool = False
 
-    #
-    #  Default binary, if non given
-    #
-    tmux_bin = "tmux"
-
-    lib_version = __version__
+    lib_version: str = __version__
 
     def __init__(
         self,
@@ -94,7 +89,7 @@ class TmuxConfig:
         #  if parse_cmd_line is True all other parameters are ignored
         #
         conf_file: str = "~/.tmux.conf",  # where to store conf file
-        tmux_bin: str = "tmux",
+        tmux_bin: str = "tmux",  #  Default binary, if none given
         tmux_version: str = "",
         replace_config: bool = False,  # replace config with no prompt
         clear_plugins: bool = False,  # remove all current plugins
@@ -110,9 +105,7 @@ class TmuxConfig:
             clear_plugins = args.clear_plugins
             plugins_display = args.plugins_display
 
-        if not tmux_bin:
-            # Use default for class
-            tmux_bin = self.tmux_bin
+        self.tmux_bin = ""
 
         #  cant use self.is_tmate() at this point, since self.tmux_bin
         #  is not yet set
@@ -135,13 +128,6 @@ class TmuxConfig:
         print(f"Processing: {__main__.__file__}")
 
         self.conf_file = verify_conf_file_usable(conf_file)
-
-        #
-        #  add the class to have the functionality needed during
-        #  self.find_tmux_bin(), it will later be called again with
-        #  the version details for the actually used version
-        #
-        # self.define_tmux_vers()
 
         self.find_tmux_bin(tmux_bin, requested_vers=tmux_version)
         if tmux_version and (tmux_version != self.vers.get()):  # type: ignore
@@ -285,7 +271,7 @@ class TmuxConfig:
     #  Some general methods that might be useful
     #
     # ================================================================
-    def vers_ok(self, vers) -> bool:
+    def vers_ok(self, vers: str) -> bool:
         return self.vers.is_ok(vers)  # type: ignore
 
     # ================================================================
@@ -344,7 +330,7 @@ class TmuxConfig:
         for line in self.es.content():
             self.write(line)
 
-    def list_plugin_methods(self):
+    def list_plugin_methods(self) -> list[Callable[[], list[str]]]:
         """Support for plugins.py, provides a list of all plugin_... methods"""
         plugin_mthds: list[Callable[[], list[str]]] = []
         if self.plugin_handler:
@@ -354,10 +340,10 @@ class TmuxConfig:
                 plugin_mthds.append(getattr(self, item))
         return plugin_mthds
 
-    def write_enable(self, state: bool):
+    def write_enable(self, state: bool) -> None:
         self._write_enabled = state
 
-    def conf_file_header(self):
+    def conf_file_header(self) -> None:
         """Creates the conf-file header & sets a few env variables about
         what tmux and config file is used, so that external commands
         know what to call if needed.
@@ -384,36 +370,42 @@ class TmuxConfig:
         #
         #      Creation time: {datetime.now().strftime("%y-%m-%d %H:%M:%S")}
         #          tmux-conf: {self.lib_version}
-        #         Created on: {run_shell('hostname').strip()}
-        #        Source file: {__main__.__file__}
-        # """
+        #         Created on: {run_shell('hostname').strip()}"""
         )
         if self.vers.get() != self.vers.get_actual():  # type: ignore
             w(f"#     actual version: ({self.vers.get_actual()})")  # type: ignore
         w(f"#   For tmux version: {self.vers.get()}")  # type: ignore
         w(
             f"""#
+        #
+        #  Three env variables defining this instance of tmux:
+        #
+
+        #
+        #  When you might use various tmux instances or tmux is not in
+        #  path, the safe bet is to allways use $TMUX_BIN in a shell, not tmux!
+        #
+        TMUX_BIN="{self.tmux_bin}"
+
+        #
+        #  Helper pointitng to what conf file defines this env
+        #  If you want to source the config, especially if the config
+        #  might not be in the default location do:
+        #    $TMUX_BIN source $TMUX_CONF
+        #
+        TMUX_CONF="{self.conf_file}"
+
+        #
         #  Since this is a compiled config file, please examine $TMUX_SOURCE
         #  for what generated this. That is the right place for any changes
         #  and to examine comments about what is generated and why.
         #  This .conf file will frequently be over-written!
         #
         TMUX_SOURCE="{__main__.__file__}"
-
-        #
-        #  Helper pointitng to what conf file defines this env
-        #
-        TMUX_CONF="{self.conf_file}"
-
-        #
-        #  tpm and other apps can use this env variable to use the
-        #  "right" tmux binary if you run multiple tmux versions.
-        #
-        TMUX_BIN="{self.tmux_bin}"
         """
         )
 
-    def write(self, cmd: str = "", eol: str = "\n"):
+    def write(self, cmd: str = "", eol: str = "\n") -> None:
         """Writes tmux cmds to config file
 
         Filters out -N "note" statements if not supported, so they can
@@ -456,7 +448,7 @@ class TmuxConfig:
                     )
                 f.write(f"{line}{eol}")
 
-    def filter_note(self, line: str):
+    def filter_note(self, line: str) -> list[str]:
         """Returns list of lines, if notes are not supported
         first an empty spacer line, then the note as a comment,
         and finally the actual command without the note
@@ -501,7 +493,7 @@ class TmuxConfig:
     #
     #  Should conf file be replaced?
     #
-    def verify_replace(self):
+    def verify_replace(self) -> None:
         """Get verification that a config should be over-written
         the param replace_config=True skips this check
         """
@@ -511,7 +503,7 @@ class TmuxConfig:
         elif os.path.exists(self.conf_file):
             self.check_replace_custom_config()
 
-    def check_replace_default_config(self):
+    def check_replace_default_config(self) -> None:
         if os.path.isfile(self.conf_file) or os.path.islink(self.conf_file):
             confirmation = input(
                 "Do you wish to replace the default config file (y/n)?"
@@ -522,7 +514,7 @@ class TmuxConfig:
             print("Terminating...")
             sys.exit(1)
 
-    def check_replace_custom_config(self):
+    def check_replace_custom_config(self) -> None:
         confirmation = input(f"Do you wish to replace {self.conf_file} (y/n)?")
         if confirmation not in ("y", "Y"):
             print("Terminating...")
@@ -531,13 +523,15 @@ class TmuxConfig:
     #
     #  Selecting tmux bin
     #
-    def find_tmux_bin(self, cmd: str = "", requested_vers: str = "") -> bool:
+    def find_tmux_bin(self, cmd: str = "", requested_vers: str = "") -> None:
         """if tmux should use a specific version, when generating config
         set requested_vers parameter, if empy the actual version is used
+        if found, will set self.tmux_bin and more
+        if not Raises exception
         """
         if not cmd:
             #  Use the first that gives something
-            cmd = self.find_cmd_1() or self.find_cmd_2() or self.find_cmd_3()
+            cmd = self.find_cmd_1() or self.full_path_cmd() or self.find_cmd_3()
 
         if not cmd:
             raise TmuxConfNotTmuxCommand("No tmux command found")
@@ -549,9 +543,9 @@ class TmuxConfig:
             #  tmux not found abort
             print("ERROR could not find tmux binary, aborting")
             sys.exit(1)
-        return True
+        return
 
-    def find_cmd_1(self):
+    def find_cmd_1(self) -> str:
         """First check is to see if the tmux used to generate the
         previous config can be extracted.
         """
@@ -568,12 +562,7 @@ class TmuxConfig:
             print(f"found {cmd} in conf file")
         return cmd
 
-    def find_cmd_2(self):
-        """Next check PATH"""
-        print("find_cmd_2()")
-        return self.full_path_cmd()
-
-    def find_cmd_3(self):
+    def find_cmd_3(self) -> str:
         """Finally try some likely locations"""
         cmd = ""
         for c in (
@@ -584,21 +573,17 @@ class TmuxConfig:
             c2 = expanduser_plus(c)
             if is_executable(c2):
                 cmd = c2
+                print(f"found {cmd} manually")
                 break
         return cmd
 
-    def use_tmux_bin(self, tmux_bin="tmux", requested_vers=""):
+    def use_tmux_bin(self, tmux_bin: str = "tmux", requested_vers: str = "") -> bool:
         """Returns True if this was a valid tmux bin
         If this was the case self.tmux_bin & self.vers will have been set
         """
         parts = run_shell(f"{tmux_bin} -V").split(" ")
         if len(parts) != 2 or parts[0] not in ("tmux", "tmate"):
             raise TmuxConfNotTmuxCommand("{tmux} Doesnt seem to be a tmux binary")
-        #
-        #  Ensure version generated for a previous tmux bin is not still
-        #  arround
-        #
-        self.vers = None
 
         vers = VersionCheck(actual_vers=parts[1], requested_vers=requested_vers)
         # except TmuxConfInvalidTmuxVersion:
@@ -611,7 +596,7 @@ class TmuxConfig:
     #
     #  Various attempt at finding the tmux bin
     #
-    def expand_cmd_path(self, cmd, requested_vers=""):
+    def expand_cmd_path(self, cmd: str, requested_vers: str = "") -> None:
         """If this is an asdf tmux, we need to translate path from shim
         to actual bin, in order to ptoperly detect version, but make sure
         not to expand an asdf path that has already been processed!
@@ -644,17 +629,17 @@ class TmuxConfig:
             )
             self.use_tmux_bin(cmd_asdf)
 
-    def full_path_cmd(self, cmd="tmux"):
+    def full_path_cmd(self, cmd: str = "tmux") -> str:
         c = run_shell(f"command -v {cmd}")
         if c and c.lower().find("not found") < 0:
             cmd = c
             print(f"found {cmd} in PATH")
         return cmd
 
-    def remove_conf_file(self):
+    def remove_conf_file(self) -> None:
         if os.path.exists(self.conf_file):
             #  Ensure we start with an empty file
             os.remove(self.conf_file)
 
-    def is_tmate(self):
+    def is_tmate(self) -> bool:
         return self.tmux_bin.find("tmate") > -1

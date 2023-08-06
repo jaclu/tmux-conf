@@ -14,7 +14,7 @@
 
 
 class VersionCheck:
-    def __init__(self, actual_vers, requested_vers=None):
+    def __init__(self, actual_vers: str, requested_vers: str = ""):
         self._vers_actual = self.normalize_vers(actual_vers)
         if requested_vers:
             self._vers = self.normalize_vers(requested_vers)
@@ -47,7 +47,7 @@ class VersionCheck:
         """The version of the tmux bin"""
         return self._vers_actual
 
-    def is_ok(self, vers) -> bool:
+    def is_ok(self, vers: str) -> bool:
         """Checks version vs current tmux environment
         Param is forgiving, can be int, float or string.
         When given as int .0 is appended
@@ -78,7 +78,7 @@ class VersionCheck:
             r = False
         return r
 
-    def get_sub_vers(self, v2: str):
+    def get_sub_vers(self, v2: str) -> tuple[int, str]:
         int_part = ""
         for c in v2:
             try:

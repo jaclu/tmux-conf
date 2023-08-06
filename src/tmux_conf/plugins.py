@@ -71,7 +71,7 @@ class Plugins:
             #
             self.clear()
 
-    def found(self, short_name=True):
+    def found(self, short_name: bool = True) -> list[str]:
         """Returns a list of plugin names being used.
         If short_name is False will return the full name including
         source, this is needed when cloning the repo, but less desired
@@ -132,7 +132,7 @@ class Plugins:
                 self._skipped_plugins.append((str(vers_min), plugin_name))
         self._skipped_plugins.sort()
 
-    def display_info(self):
+    def display_info(self) -> str:
         """List selected and ignored plugins, depending on param"""
         print(f"\n\t=====  tmux {self._vers.get()} - Plugins defined  =====")
         print(f" for: {__main__.__file__}")
@@ -224,7 +224,7 @@ class Plugins:
 
         sys.exit(0)
 
-    def parse(self):
+    def parse(self) -> list[Union[str, list[str]]]:
         """This package will use any plugin defining methods it can find.
         They will be sorted alphabetically by method name, normally the order
         of plugins do not matter, but if you do want to force the sorting,
@@ -281,7 +281,7 @@ class Plugins:
         output.append("")  # spacer between sections
         return output
 
-    def get_env(self):
+    def get_env(self) -> tuple[str, str]:
         location = os.path.dirname(os.path.expanduser(self._conf_file))
         if location == os.path.expanduser("~"):
             #
@@ -306,7 +306,7 @@ class Plugins:
 
         return plugins_dir, tpm_env
 
-    def mkscript_manual_deploy(self):
+    def mkscript_manual_deploy(self) -> list[str]:
         """This script is run as tmux starts, all non-present
         plugins are installed, and an attempt is done to initialize
         each plugin.
@@ -355,7 +355,7 @@ class Plugins:
         )
         return output
 
-    def mkscript_tpm_deploy(self):
+    def mkscript_tpm_deploy(self) -> list[str]:
         """If tpm is present, it is started.
         If not, it is installed and requested to install all
         defined plugins.

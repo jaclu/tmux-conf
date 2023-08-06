@@ -43,7 +43,7 @@ class EmbeddedScripts:
         script: list[str],
         use_bash: bool = False,
         built_in: bool = False,
-    ):
+    ) -> None:
         """Creates a script, supplied as a list of lines
         script lines can be regular lines as string, or multi-line strings
 
@@ -117,7 +117,7 @@ class EmbeddedScripts:
         cmd += '"'
         return cmd
 
-    def content(self):
+    def content(self) -> list[str]:
         """Generates the code for embedded scripts to be written to
         the conf file"""
         if not (self._use_embedded_scripts and self._scripts):
@@ -151,7 +151,7 @@ class EmbeddedScripts:
         output.append('# "$@" #  This triggers the embedded script')
         return output
 
-    def get_dir(self):
+    def get_dir(self) -> str:
         """Retrieves the location where scripts should be saved"""
         if self._use_embedded_scripts:
             raise SyntaxError("get_dir() called when use_embedded_scripts is True")
