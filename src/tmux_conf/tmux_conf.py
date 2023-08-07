@@ -50,7 +50,8 @@ class TmuxConfig:
     #  processed
     #
     #  set this to 'jaclu/tpm' if you want to try that one!
-    #  set it to '' if you do not want to use tpm at all.
+    #  set it to "manual" if you dont want to use tpm.
+    #  set it to '' if you do not want to use plugins at all.
     #
     plugin_handler: str = "tmux-plugins/tpm"
 
@@ -69,12 +70,12 @@ class TmuxConfig:
     #
     #  Indicates if this host is low on performance, don't enable
     #  demanding plugins etc, I use this on my iSH nodes.
-    #  This must be set during __init__(). It is assumed to alreadt been
+    #  This must be set during __init__(). It is assumed to already been
     #  set to the intended state when self.run() is done.
     #
     #  The only usage of this in this package is to propagate it to
     #  the plugin handler, indicating as plugins are installed and
-    #  activated, since this might take a noticeable time on slowe nodes.
+    #  activated, since this might take a noticeable time on slower nodes.
     #  It is also avaiable in derived plugin_ methods
     #
     #  Other usages of this is up to implementation classes
@@ -143,7 +144,7 @@ class TmuxConfig:
                     + " than the one used to generate this.\n"
                     + "Since the config file will point to the tmux used, "
                     + "this might cause problems\n"
-                    + f"\ttmux vers is:    {self.vers.get_actual()}\n"  # type: ignore
+                    + f"\ttmux vers is:    {self.vers.get_actual()}\n"
                     + f"\trequested vers:  {self.vers.get()}"  # type: ignore
                 )
                 print()
@@ -353,7 +354,7 @@ class TmuxConfig:
         self._write_stdout = False
         self.write_enable(True)
 
-        print(f"Writing tmux {self.vers.get()} config to {self.conf_file}")  # type: ignore
+        print(f"Writing tmux {self.vers.get()} config to {self.conf_file}")
 
         w = self.write
         if self.use_embedded_scripts:
@@ -374,7 +375,7 @@ class TmuxConfig:
         #         Created on: {run_shell('hostname').strip()}"""
         )
         if self.vers.get() != self.vers.get_actual():  # type: ignore
-            w(f"#     actual version: ({self.vers.get_actual()})")  # type: ignore
+            w(f"#     actual version: ({self.vers.get_actual()})")
         w(f"#   For tmux version: {self.vers.get()}")  # type: ignore
         w(
             f"""#
@@ -626,7 +627,7 @@ class TmuxConfig:
             #
             cmd_asdf = (
                 f'{cmd.split("shims/")[0]}installs/tmux/'
-                f'{self.vers.get().split("-",maxsplit=1)[0]}/bin/tmux'  # type: ignore
+                f'{self.vers.get().split("-",maxsplit=1)[0]}/bin/tmux'
             )
             self.use_tmux_bin(cmd_asdf)
 
