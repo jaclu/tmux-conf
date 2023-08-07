@@ -83,7 +83,7 @@ class EmbeddedScripts:
                 shebang = "#!/bin/sh"
 
             script.insert(0, f"{shebang}\n")
-            script.append(scr_name)  # trigger it to run without a param
+            script.append(f'{scr_name} "$@"')  # trigger it to run without a param
 
             fname = f"{script_dir}/{scr_name}.sh"
             with open(fname, "w", encoding="utf-8") as f:
@@ -115,6 +115,12 @@ class EmbeddedScripts:
         else:
             cmd += f"{self.get_dir()}/{scr_name}.sh"
         cmd += '"'
+        return cmd
+
+    def call_script(self, scr_name: str) -> str:
+        cmd = scr_name
+        if not self._use_embedded_scripts:
+            cmd = f"{self.get_dir()}/{scr_name}.sh"
         return cmd
 
     def content(self):

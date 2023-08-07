@@ -44,7 +44,7 @@ In order to define when the script is run call self.es.run_it(script name),
 this will insert a run statement, in this case bound to a key:
 
 ```python
-    w(f"bind -N 'Toggle mouse on/off'  M  {self.es.run_it(self.fnc_toggle_mouse)}")
+w(f"bind -N 'Toggle mouse on/off'  M  {self.es.run_it(self.fnc_toggle_mouse)}")
 ```
 
 With `use_embedded_scripts = True` the script will be embedded in the
@@ -65,12 +65,42 @@ I prefer to use embedded scripts, this ensures that no out of date
 scripts hang around in scripts/ and eliminates risk of scripts not found
 if they are deleted, but either is valid so entirely up to you.
 
+## Calling another defined script
+
+If you want one defined script to call another one, you can use this
+notation to be isolated from having to adopt to the scripts being
+embedded or external
+
+```python
+...
+{self.es.call_script(self.fnc_toggle_mouse)}
+...
+```
+
+With `use_embedded_scripts = True` the script will be refered as a local
+function:
+
+```bash
+...
+toggle_mouse
+...
+```
+
+With `use_embedded_scripts = False` the script will be refered with
+absolute path and suffix:
+
+```bash
+...
+/Users/jaclu/.tmux/scripts/toggle_mouse.sh
+...
+```
+
 ## Background scripts
 
 If the script is intended to run in the background add the param in_bg=True
 
 ```python
-    w(f"bind -N 'Toggle mouse on/off'  M  {self.es.run_it(self.fnc_toggle_mouse, in_bg=True)}")
+w(f"bind -N 'Toggle mouse on/off'  M  {self.es.run_it(self.fnc_toggle_mouse, in_bg=True)}")
 ```
 
 Resulting in:
@@ -86,7 +116,7 @@ is needed, self.es.create() has an optional param use_bash that can be
 set to True
 
 ```python
-    self.es.create(self.fnc_toggle_mouse, toggle_mouse_sh, use_bash=True)
+self.es.create(self.fnc_toggle_mouse, toggle_mouse_sh, use_bash=True)
 ```
 
 This would generate the following (the correct path to bash is scanned
