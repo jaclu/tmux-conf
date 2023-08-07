@@ -1,6 +1,6 @@
 [project]
 name = "tmux_conf"
-version = "0.16.5"
+version = "0.16.6"
 authors = [
   { name="Jacob Lundqvist", email="Jacob.Lundqvist@gmail.com" },
 ]
