@@ -1,10 +1,7 @@
-
-# embeded scripts
+# EmbededScripts
 
 test_es_XDG
     make the test actually check for something XDG related
-
-# plugins
 
 ## dummy env
 

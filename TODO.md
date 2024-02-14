@@ -2,6 +2,7 @@
 
 ## check if bin is tmux (or tmate)
 
+```shell
 #
 #  Returns true and sets tmux bin & vers if this seems to be usable
 #  otherwise returns False
@@ -35,3 +36,4 @@ extract_tmux_vers(vers_str_in):
     #  loop over parts[1] as long as each char is an int, then
     #  ensure next char is a-z
     return maj, min
+```
