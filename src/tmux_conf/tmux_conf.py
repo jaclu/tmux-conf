@@ -585,7 +585,7 @@ class TmuxConfig:
         """
         parts = run_shell(f"{tmux_bin} -V").split(" ")
         if len(parts) != 2 or parts[0] not in ("tmux", "tmate"):
-            raise TmuxConfNotTmuxCommand("{tmux} Doesnt seem to be a tmux binary")
+            raise TmuxConfNotTmuxCommand(f"{tmux_bin} Doesnt seem to be a tmux binary")
 
         vers = VersionCheck(actual_vers=parts[1], requested_vers=requested_vers)
         # except TmuxConfInvalidTmuxVersion:
