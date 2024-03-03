@@ -627,7 +627,7 @@ class TmuxConfig:
             #
             cmd_asdf = (
                 f'{cmd.split("shims/")[0]}installs/tmux/'
-                f'{self.vers.get().split("-",maxsplit=1)[0]}/bin/tmux'
+                f'{self.vers.get().split("-", maxsplit=1)[0]}/bin/tmux'
             )
             self.use_tmux_bin(cmd_asdf)
 

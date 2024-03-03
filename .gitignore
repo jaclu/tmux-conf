@@ -1,7 +1,8 @@
-
 # Text edior cruft
 *~
 *#
+
+.shellchecker.cache
 
 other/
 
@@ -12,9 +13,7 @@ other/
 .vscode/
 *.code-workspace
 
-
 # settings.json
-
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
