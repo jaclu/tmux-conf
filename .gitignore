@@ -2,7 +2,8 @@
 *~
 *#
 
-.shellchecker.cache
+# olint linter config
+.cache.olint
 
 other/
 
