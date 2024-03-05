@@ -11,7 +11,8 @@ from src.tmux_conf.vers_check import VersionCheck
 from .utils_test import (
     install_plugins,
     tmux_conf_instance,
-    tst_conf_base,
+    # tst_conf_base,
+    test_p_install,
     tst_conf_file,
     tst_plugins_dir,
 )

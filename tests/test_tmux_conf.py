@@ -373,7 +373,7 @@ def not_test_tc_too_old_for_plugins(capfd):
     ancient_vers = "1.0"
     with pytest.raises(SystemExit) as exc:
         TmuxConfig(parse_cmd_line=False, tmux_version=ancient_vers, plugins_display=1)
-        a = 2
+        # a = 2
     out, _ = capfd.readouterr()
     assert exc.value.code.find("Versions < 1.9 does not support tpm") > -1
 
