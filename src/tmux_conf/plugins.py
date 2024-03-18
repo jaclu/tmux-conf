@@ -1,15 +1,15 @@
 #
-#  Copyright (c) 2022: Jacob.Lundqvist@gmail.com
+#  Copyright (c) 2022-2024: Jacob.Lundqvist@gmail.com
 #  License: MIT
 #
 #  Part of https://github.com/jaclu/tmux-conf
 #
 #  See constants.py for version info
 #
-#  Class that handles tmux plugins
-#
 #  See the README.md in the repository for more info
 #
+
+""" Class that handles tmux plugins """
 
 import os
 import shutil
@@ -30,6 +30,8 @@ PLUGIN_STATIC_CODE = 2
 #  Tasks related to plugins, taken separately to keep files smaller
 #
 class Plugins:
+    """Class that handles tmux plugins"""
+
     def __init__(
         self,
         conf_file: str,  # must use tilde for home dir
@@ -212,7 +214,6 @@ class Plugins:
         for vers, name in self._skipped_plugins:
             max_l_v = max(max_l_v, len(vers))
         print("-----   Plugins ignored   -----")
-        #  TODO: space after Min
         print(f'{"Min":<{max_l_v}}|{" Plugin name":<{max_l_name}}')
         print(f'{"vers":<{max_l_v}}|\n')
         for vers, name in self._skipped_plugins:
@@ -239,7 +240,7 @@ class Plugins:
 
         Here are a few examples:
         """
-        if not (self._used_plugins):
+        if not self._used_plugins:
             return []
 
         output = []
@@ -278,6 +279,7 @@ class Plugins:
         return output
 
     def get_env(self):
+        """get environment"""
         location = os.path.dirname(os.path.expanduser(self._conf_file))
         if location == os.path.expanduser("~"):
             #
@@ -291,7 +293,6 @@ class Plugins:
                 tpm_env = ""
         else:
             xdg_home = os.environ.get(XDG_CONFIG_HOME)
-            # pylint: disable=consider-using-assignment-expr
             if xdg_home:
                 conf_base = os.path.expanduser(xdg_home)
             else:

@@ -1,6 +1,6 @@
 #  -*- mode: python; mode: fold -*-
 #
-#  Copyright (c) 2022: Jacob.Lundqvist@gmail.com
+#  Copyright (c) 2022-2024: Jacob.Lundqvist@gmail.com
 #  License: MIT
 #
 #  Part of https://github.com/jaclu/tmux-conf
@@ -11,6 +11,8 @@
 #
 #  All paths stored internally are done so with ~ expanded
 #
+
+"""Common stuff"""
 
 import argparse
 import os
@@ -41,11 +43,14 @@ def expanduser_plus(path: str) -> str:
 
 
 def is_executable(cmd: str) -> bool:
+    """check if cmd is executable"""
     fpath = os.path.expanduser(cmd)
     return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
 
 
 def parse_cmdline(args):
+    """Parse command line options"""
+
     parser = argparse.ArgumentParser(
         description="This tmux conf compiler generates configs for tmux "
         + "versions 1.5 and up."
@@ -155,7 +160,6 @@ def verify_conf_file_usable(conf_file: str) -> str:
         raise OSError from error
 
     #  Ensure it can be written to
-    # pylint: disable=too-many-try-statements
     try:
         with open(conf_file, "a", encoding="utf-8") as _:
             pass

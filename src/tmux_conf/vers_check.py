@@ -1,6 +1,6 @@
 #  -*- mode: python; mode: fold -*-
 #
-#  Copyright (c) 2022: Jacob.Lundqvist@gmail.com
+#  Copyright (c) 2022-2024: Jacob.Lundqvist@gmail.com
 #  License: MIT
 #
 #  Part of https://github.com/jaclu/tmux-conf
@@ -11,9 +11,12 @@
 #
 #  See the README.md in the repository for more info
 #
+"""compares tmux versions"""
 
 
 class VersionCheck:
+    """compares tmux versions"""
+
     def __init__(self, actual_vers: str, requested_vers: str = ""):
         self._vers_actual = self.normalize_vers(actual_vers)
         if requested_vers:
@@ -79,6 +82,8 @@ class VersionCheck:
         return r
 
     def get_sub_vers(self, v2: str):
+        """get sub version"""
+
         int_part = ""
         for c in v2:
             try:

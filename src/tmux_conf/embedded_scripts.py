@@ -1,16 +1,16 @@
 #  -*- mode: python; mode: fold -*-
 #
-#  Copyright (c) 2022: Jacob.Lundqvist@gmail.com
+#  Copyright (c) 2022-2024: Jacob.Lundqvist@gmail.com
 #  License: MIT
 #
 #  Part of https://github.com/jaclu/tmux-conf
 #
 #  See constants.py for version info
 #
-#  Class that handles embedded scripts
-#
 #  See the README.md in the repository for more info
 #
+
+"""Class that handles embedded scripts"""
 
 import os
 import pathlib
@@ -105,7 +105,7 @@ class EmbeddedScripts:
             if scr_name in self._bash_scripts:
                 if not self._bash_shell:
                     bash_shell = run_shell("command -v bash")
-                    if not (bash_shell):
+                    if not bash_shell:
                         sys.exit("Failed to find bash!")
                     self._bash_shell = bash_shell
                 cmd += self._bash_shell
@@ -118,6 +118,7 @@ class EmbeddedScripts:
         return cmd
 
     def call_script(self, scr_name: str) -> str:
+        """call a script"""
         cmd = scr_name
         if not self._use_embedded_scripts:
             cmd = f"{self.get_dir()}/{scr_name}.sh"
@@ -168,7 +169,6 @@ class EmbeddedScripts:
             conf_file = os.path.expanduser(self._conf_file)
 
             xdg_home = os.environ.get(XDG_CONFIG_HOME)
-            # pylint: disable=consider-using-assignment-expr
             if xdg_home:
                 conf_base = xdg_home
             else:

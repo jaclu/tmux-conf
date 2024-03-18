@@ -1,18 +1,19 @@
 #
-#  Copyright (c) 2022: Jacob.Lundqvist@gmail.com
+#  Copyright (c) 2022-2024: Jacob.Lundqvist@gmail.com
 #  License: MIT
 #
 #  Part of https://github.com/jaclu/tmux-conf
 #
 #  See constants.py for version info
 #
-#  Class that generates a .tmux.conf
-#
 #  See the README.md in the repository for more info
 #
 #  All paths stored internally are done so with ~ expanded
 #
 
+# pylint: disable=C0116
+
+"""Class that generates a .tmux.conf"""
 
 # from datetime import datetime
 import datetime
@@ -39,6 +40,8 @@ from .vers_check import VersionCheck
 
 
 class TmuxConfig:
+    """Class that generates a .tmux.conf"""
+
     #
     #  I have forked a tpm that uses TPM_BIN to use the right tmux
     #  context. If you just use one version of tmux, this does not
@@ -483,7 +486,6 @@ class TmuxConfig:
             note = post.split()[0]
             post = post[note_end:]
 
-        # pylint: disable=while-used,compare-to-zero
         while post.find("   ") == 0:
             post = post[1:]
         new_line = pre + post
@@ -592,6 +594,7 @@ class TmuxConfig:
         #     print("{parts[[1]} Doesnt seem to be a valid tmux version")
         #     return False
         self.tmux_bin = tmux_bin
+        # pylint: disable=W0201
         self.vers = vers
         return True
 
