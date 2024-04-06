@@ -232,7 +232,8 @@ def not_test_tc_conf_file_create_default(capfd):
     out, _ = capfd.readouterr()
     if os.path.exists(tmp_conf_file):
         shutil.move(tmp_conf_file, def_conf_file)
-    assert out.find("Do you wish to create a default config file (y/n)?") > -1
+    assert out.find(
+        "Do you wish to create a default config file (y/n)?") > -1
 
 
 def not_test_tc_conf_file_no_write(capfd):
@@ -323,7 +324,8 @@ def not_test_tc_default_bin_found():
     # with pytest.raises(Exception):
     #     TmuxConfig(parse_cmd_line=False, conf_file=CONF_FILE)
     if pytest.raises(Exception):
-        # Use the pytest.raises context manager to capture any exceptions raised by the function
+        # Use the pytest.raises context manager to capture
+        # any exceptions raised by the function
         my_func()
     assert True
 

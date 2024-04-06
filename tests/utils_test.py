@@ -10,10 +10,12 @@ def remove_conf_file():
 
 def install_plugins(conf_file):
     # if run_shell("command -v bash"):
-    os.system(f"cut -c3- {conf_file} | bash -s activate_plugins_mamually")
+    os.system(f"cut -c3- {conf_file} | "
+              "bash -s activate_plugins_mamually")
 
 
-def tmux_conf_instance(cls, tmux_conf, tmux_version="", clear_plugins=False, plugins_display=0):
+def tmux_conf_instance(cls, tmux_conf, tmux_version="",
+                       clear_plugins=False, plugins_display=0):
     t = cls(
         parse_cmd_line=False,
         tmux_version=tmux_version,
