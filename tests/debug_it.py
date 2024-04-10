@@ -4,7 +4,7 @@ tmux version. And defining some plugins of various complexity
 
 Also shows various methods to define plugins
 """
-from tmux_conf.tmux_conf import TmuxConfig
+from src.tmux_conf.tmux_conf import TmuxConfig
 
 from .utils_test import CONF_FILE
 

@@ -1,0 +1,47 @@
+[bandit]
+# This is a sample Bandit user configuration file.
+# You can customize Bandit's behavior by modifying these settings.
+
+# Severity levels to report (comma-separated). Valid values: LOW, MEDIUM, HIGH
+# Default: HIGH
+# severity: HIGH
+
+# Confidence levels to report (comma-separated). Valid values: LOW, MEDIUM, HIGH
+# Default: HIGH
+# confidence: HIGH
+
+# List of plugins to enable (comma-separated). Use 'bandit -ll' to list available plugins.
+# Default: all plugins enabled
+# plugins: 
+
+# Excludes paths from scan (comma-separated). Accepts globs.
+# Default: None
+# exclude: 
+
+# List of test IDs to skip (comma-separated).
+# Default: None
+skips = B101
+
+# Allow bandit to use eval.
+# Default: False
+# allow_eval: False
+
+# Allow bandit to use exec.
+# Default: False
+# allow_exec: False
+
+# Allow bandit to use xml.etree.ElementTree.parse.
+# Default: False
+# allow_xml_etree: False
+
+# Allow bandit to use cPickle.
+# Default: False
+# allow_pickle: False
+
+# Allow bandit to use string-based exceptions.
+# Default: False
+# allow_expressions: False
+
+# Allow bandit to use shell-based subprocess calls.
+# Default: False
+# allow_shell: False

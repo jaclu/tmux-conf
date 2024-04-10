@@ -1,4 +1,6 @@
 import os
+import shutil
+import tempfile
 
 import pytest
 
@@ -10,12 +12,12 @@ def remove_conf_file():
 
 def install_plugins(conf_file):
     # if run_shell("command -v bash"):
-    os.system(f"cut -c3- {conf_file} | "
-              "bash -s activate_plugins_mamually")
+    os.system(f"cut -c3- {conf_file} | " "bash -s activate_plugins_mamually")  # nosec
 
 
-def tmux_conf_instance(cls, tmux_conf, tmux_version="",
-                       clear_plugins=False, plugins_display=0):
+def tmux_conf_instance(
+    cls, tmux_conf, tmux_version="", clear_plugins=False, plugins_display=0
+):
     t = cls(
         parse_cmd_line=False,
         tmux_version=tmux_version,
@@ -44,21 +46,28 @@ def tst_conf_base(tmp_path):
     return base_path
 
 
-@pytest.fixture()
-def tst_conf_file(tst_conf_base):
-    return f"{tst_conf_base}/tmux.conf"
+# @pytest.fixture()
+# def tst_conf_file(tst_conf_base):
+#     return f"{tst_conf_base}/tmux.conf"
 
 
-@pytest.fixture()
-def tst_plugins_dir(tst_conf_base):
-    plugin_dir = f"{tst_conf_base}/plugins"
-    os.mkdir(plugin_dir)
-    return plugin_dir
+# @pytest.fixture()
+# def tst_plugins_dir(tst_conf_base):
+#     plugin_dir = f"{tst_conf_base}/plugins"
+#     os.mkdir(plugin_dir)
+#     return plugin_dir
 
 
 # def tst_plugins_dir(tmp_conf_base) -> str:
 #     return str(os.path.join(tmp_conf_base, "plugins"))
 
-_conf_base = "/tmp/foo32/tmux"
-CONF_FILE = f"{_conf_base}/tmux.conf"
+
+def cleanup_temp_dir():
+    shutil.rmtree(_conf_base, ignore_errors=True)
+
+
+_conf_base = tempfile.mkdtemp(prefix="foo32")
+CONF_FILE = os.path.join(_conf_base, "tmux.conf")
+
+
 PLUGINS_DIR = f"{_conf_base}/plugins"

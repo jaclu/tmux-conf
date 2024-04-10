@@ -1,6 +1,7 @@
 import os
 
 import pytest
+
 from src.tmux_conf.embedded_scripts import EmbeddedScripts
 from src.tmux_conf.utils import run_shell
 
@@ -46,14 +47,15 @@ def not_test_es_no_plugins_should_return_empty():
 def not_test_es_relative_conf_file():
     conf_file = "dummy_conf"
     es = es_env(conf_file)
+    # pylint: disable=W0212
     print(f">> conf_file: {es._conf_file}")
     assert es._conf_file.split("/")[-1] == conf_file
 
 
-def not_test_es_XDG():
+def not_test_es_xdg():
     if not run_shell("command -v bash"):
         pytest.skip("No bash found")
-    os.environ["XDG_CONFIG_HOME"] = "/tmp"
+    os.environ["XDG_CONFIG_HOME"] = "/tmp"  # nosec
     es = es_hello_world(use_embedded_scripts=False, use_bash=True)
     bash_sh = es.run_it(SCRIPT_NAME).split('"')[1]
     os.environ.pop("XDG_CONFIG_HOME")

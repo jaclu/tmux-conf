@@ -17,7 +17,7 @@
 class VersionCheck:
     """compares tmux versions"""
 
-    def __init__(self, actual_vers: str, requested_vers: str = ""):
+    def __init__(self, actual_vers, requested_vers=None):
         self._vers_actual = self.normalize_vers(actual_vers)
         if requested_vers:
             self._vers = self.normalize_vers(requested_vers)
@@ -50,7 +50,7 @@ class VersionCheck:
         """The version of the tmux bin"""
         return self._vers_actual
 
-    def is_ok(self, vers: str) -> bool:
+    def is_ok(self, vers) -> bool:
         """Checks version vs current tmux environment
         Param is forgiving, can be int, float or string.
         When given as int .0 is appended

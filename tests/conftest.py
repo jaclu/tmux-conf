@@ -1,3 +1,7 @@
+"""
+Test module
+"""
+
 import sys
 
 import pytest
@@ -18,4 +22,4 @@ def capture_stdout(monkeypatch):
 @pytest.fixture
 def xdg_config_home(monkeypatch):
     with monkeypatch.context() as m:
-        m.setenv("XDG_CONFIG_HOME", "/tmp/foo/xdg")
+        m.setenv("XDG_CONFIG_HOME", "/tmp/foo/xdg")  # nosec
