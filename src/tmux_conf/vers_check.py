@@ -108,6 +108,12 @@ class VersionCheck:
             #  the normal logic, and can be used in vers checks
             #
             vers = "3.3a-git20230428"
+        elif vers == "3.1-rc":
+            #
+            #  asdf tmux 3.1 reports as 3.1-rc, for simplicity just
+            #  brand it as 3.1
+            #
+            vers = "3.1"
 
         if isinstance(vers, str) and vers.find(".") < 0:
             try:
