@@ -1,6 +1,6 @@
 [project]
 name = "tmux_conf"
-version = "0.16.7"
+version = "0.16.8"
 authors = [
   { name="Jacob Lundqvist", email="Jacob.Lundqvist@gmail.com" },
 ]
@@ -21,8 +21,27 @@ documentation = "https://github.com/jaclu/tmux-conf"
 repository = "https://github.com/jaclu/tmux-conf"
 "Bug Tracker" = "https://github.com/jaclu/tmux-conf/issues"
 
+# [tool.poetry]
+# name = "tmux_conf"
+# version = "0.1.0"
+# description = "Your description here"
+# authors = ["Your Name <your.email@example.com>"]
+
+# [tool.poetry.dependencies]
+# python = "^3.9"
+
+# [tool.poetry.dev-dependencies]
+# pytest = "^6.2"
+# mypy = "^0.910"
+# flake8 = "^3.9"
+# isort = "^5.9"
+# black = "^21.6"
+
+# [tool.poetry.scripts]
+# tmux-conf = 'tmux_conf.__main__:main'
+
 [build-system]
-requires = ["setuptools>=61.0.0"]
+requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.black]
@@ -49,13 +68,15 @@ exclude = '''
 )
 '''
 
-[tool.pytest.ini_options]
-addopts = "--cov=src/tmux_conf --cov-report=term-missing"
-testpaths = [
-    "tests",
-]
+[tool.flake8]
+max-line-length = 88
+extend-ignore = "E203, W503"
+
+[tool.isort]
+profile = "black"
 
 [tool.mypy]
+python_version = "3.9"
 mypy_path = "src"
 check_untyped_defs = true
 disallow_any_generics = true
@@ -63,6 +84,7 @@ ignore_missing_imports = true
 no_implicit_optional = true
 show_error_codes = true
 strict_equality = true
+strict_optional = true
 
 warn_redundant_casts = true
 warn_return_any = true
@@ -70,3 +92,18 @@ warn_return_any = true
 warn_unreachable = true
 warn_unused_configs = true
 no_implicit_reexport = true
+
+[tool.pytest]
+addopts = "-ra -q --strict"
+python_files = ["tests/test_*.py"]
+
+[tool.pytest.ini_options]
+python_files = ["src/**/*.py"]
+addopts = "--cov=src/tmux_conf --cov-report=term-missing"
+testpaths = [
+    "tests",
+]
+
+[py.typed]
+# This file indicates that the package includes type information (PEP 561).
+# It is typically an empty file, but its presence signifies the package supports type checking.

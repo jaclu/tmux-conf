@@ -91,7 +91,7 @@ class ViNav(TmuxConfig):
         #  case 3: Dynamic options are defined inside the method.
         #
         conf = ""
-        if self.vers_ok(3.2):
+        if self.vers_ok("3.2"):
             conf = """
             set -g @menus_location_x  C
             set -g @menus_location_y  C

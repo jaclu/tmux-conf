@@ -14,6 +14,7 @@
 import os
 import shutil
 import sys
+from typing import Callable, Dict, Tuple
 
 import __main__
 
@@ -48,14 +49,11 @@ class Plugins:
 
         self._is_limited_host = False
 
-        self._used_plugins = {}
-        # self._used_plugins: dict[
-        #     str, tuple[str, Callable[[], tuple[str, str, str]], str]
-        # ] = {}  # plugins that will be used
-        #: dict[
-        #    str, tuple[str, classmethod, str]
-        # ]
-        self._skipped_plugins = []  # plugins incompatible with this version
+        self._used_plugins: Dict[str, Tuple[str, Callable[[], list[str]], str]] = {}
+
+        # plugins incompatible with this version
+        self._skipped_plugins: list[Tuple[str, str]] = []
+
         self._fnc_activate_tpm = "activate_tpm"
         self._fnc_activate_manually = "activate_plugins_mamually"
 
@@ -122,9 +120,9 @@ class Plugins:
             #  we need to convert it to a string both for used and ignored plugins
             if self._vers.is_ok(vers_min):
                 self._used_plugins[plugin_name] = (
-                    str(vers_min),  # self.PLUGIN_VERS_MIN
-                    plugin_mthd,  # self.PLUGIN_MTHD
-                    code,  # self.PLUGIN_STATIC_CODE
+                    str(vers_min),  # PLUGIN_VERS_MIN
+                    plugin_mthd,  # PLUGIN_MTHD
+                    code,  # PLUGIN_STATIC_CODE
                 )
             else:
                 self._skipped_plugins.append((str(vers_min), plugin_name))
@@ -173,13 +171,14 @@ class Plugins:
                 )
                 print("".ljust(len(inner_name) + 2, "-"))
                 print(
-                    f"> {inner_name:<{max_l_name - 2}} - {info[PLUGIN_VERS_MIN]} {suffix}"
+                    f"> {inner_name:<{max_l_name - 2}} - "
+                    f"{info[PLUGIN_VERS_MIN]} {suffix}"
                 )
-                info[PLUGIN_MTHD]()
+                info[1]()  # PLUGIN_MTHD
                 #
                 #  Skip indention, for easier read
                 #
-                for line in info[PLUGIN_STATIC_CODE].split("\n"):
+                for line in info[2].split("\n"):  # PLUGIN_STATIC_CODE
                     # if line == line.strip():
                     print(f"{line.strip()}")
                 # print()
@@ -278,7 +277,7 @@ class Plugins:
         output.append("")  # spacer between sections
         return output
 
-    def get_env(self):
+    def get_env(self) -> tuple[str, str]:
         """get environment"""
         location = os.path.dirname(os.path.expanduser(self._conf_file))
         if location == os.path.expanduser("~"):
@@ -453,7 +452,7 @@ class Plugins:
             name = name.split("/")[1]
         return name
 
-    def _remove_if_found(self, lst: list, item: str, warning: str = "") -> str:
+    def _remove_if_found(self, lst: list[str], item: str, warning: str = "") -> str:
         if item in lst:
             lst.remove(item)
             warning = ""

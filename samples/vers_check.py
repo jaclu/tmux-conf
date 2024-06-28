@@ -27,7 +27,7 @@ class DummyConfig(TmuxConfig):
         #  then do:  less ~/foo.conf
         #  And check for what was written to the config file
         #
-        min_version = 2.4
+        min_version = "2.4"
 
         if self.vers_ok(min_version):
             w("# Accepable version")
