@@ -91,8 +91,8 @@ class EmbeddedScripts:
                     f.write(f"{line}\n")
 
             #  Make it run able
-            f = pathlib.Path(fname)
-            f.chmod(f.stat().st_mode | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH)
+            f2 = pathlib.Path(fname)
+            f2.chmod(f2.stat().st_mode | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH)
 
     def run_it(self, scr_name: str, in_bg: bool = False) -> str:
         """Generate the code to run an embedded/external script"""
