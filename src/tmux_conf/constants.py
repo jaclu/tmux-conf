@@ -9,6 +9,6 @@
 #
 """packet wide constants"""
 
-__version__ = "0.16.8"
+__version__ = "0.17.0"
 
 XDG_CONFIG_HOME = "XDG_CONFIG_HOME"

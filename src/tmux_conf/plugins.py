@@ -14,6 +14,7 @@
 import os
 import shutil
 import sys
+from dataclasses import dataclass
 from typing import Callable, Dict, Tuple
 
 import __main__
@@ -25,6 +26,15 @@ from .vers_check import VersionCheck
 PLUGIN_VERS_MIN = 0
 PLUGIN_MTHD = 1
 PLUGIN_STATIC_CODE = 2
+
+# str, Tuple[str, Callable[[], list[str]], str]
+
+
+@dataclass
+class Plugin:
+    vers_min: str
+    plug_def: Callable[[bool], bool]
+    code: str
 
 
 #
@@ -67,8 +77,30 @@ class Plugins:
             #
             self.clear()
 
+    # def defined(self, short_name: bool = True):
+    #     """Returns a list of plugin names being defined.
+    #     This also includes defined but not installed plugins.
+    #     """
+    #     return
+
     def found(self, short_name: bool = True):
-        """Returns a list of plugin names being used.
+        """OBSOLETE! replaced ny installed()
+        TODO: Remove this function!
+        Returns a list of plugin names being used.
+        If short_name is False will return the full name including
+        source, this is needed when cloning the repo, but less desired
+        when just checking if a given plugin is used in most cases.
+        Since if a different fork of it is being used, the name would
+        not match."""
+        return self.installed(short_name=short_name)
+
+    def installed(self, short_name: bool = True):
+        """Returns a list of plugin names being installed.
+        This excludes defined but not already installed plugins.
+        Purpose is when defining the status bars, in order not to define
+        entries for absent plugins
+
+        Returns a list of plugin names being used.
         If short_name is False will return the full name including
         source, this is needed when cloning the repo, but less desired
         when just checking if a given plugin is used in most cases.

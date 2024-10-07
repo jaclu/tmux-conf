@@ -276,7 +276,7 @@ class TmuxConfig:
     #  Some general methods that might be useful
     #
     # ================================================================
-    def vers_ok(self, vers: str) -> bool:
+    def vers_ok(self, vers) -> bool:
         return self.vers.is_ok(vers)  # type: ignore
 
     # ================================================================
@@ -328,12 +328,36 @@ class TmuxConfig:
                         self.write(sub_line)
                 else:
                     self.write(line)
+
+        self.local_overrides()
         #
         #  Should be called as late as possible, to be able to have
         #  gathered all the intended embedded scripts.
         #
         for line in self.es.content():
             self.write(line)
+
+    def local_overrides(self) -> None:
+        """
+        Applies local configuration overrides, executed after all other
+        configuration steps. These overrides do not affect the status bar
+        configuration (see `status_bar_customization()` for that).
+
+        When overriding this method in a subclass, ensure that
+        `super().local_overrides()` is called first, to retain any overrides
+        defined by parent classes before applying additional customizations.
+        """
+        self.write(
+            """
+
+        #======================================================
+        #
+        #   Local overrides
+        #
+        #======================================================
+        """
+        )
+        # self.write("# TmuxConfig.local_overides")
 
     def list_plugin_methods(self):  # -> list[Callable[[], list[str]]]:
         """Support for plugins.py, provides a list of all plugin_... methods"""
