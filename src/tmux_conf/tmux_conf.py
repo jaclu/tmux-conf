@@ -20,7 +20,6 @@ import datetime
 import os
 import shutil
 import sys
-from collections.abc import Callable
 
 import __main__
 
@@ -148,7 +147,7 @@ class TmuxConfig:
                     + "Since the config file will point to the tmux used, "
                     + "this might cause problems\n"
                     + f"\ttmux vers is:    {self.vers.get_actual()}\n"
-                    + f"\trequested vers:  {self.vers.get()}"  # type: ignore
+                    + f"\trequested vers:  {self.vers.get()}"
                 )
                 print()
                 print("WARNING: Running this config with the current tmux")
@@ -160,7 +159,7 @@ class TmuxConfig:
         self.es = EmbeddedScripts(
             conf_file=self.conf_file,
             vers_class=self.vers,  # type: ignore
-            use_embedded_scripts=self.use_embedded_scripts
+            use_embedded_scripts=self.use_embedded_scripts,
         )
 
         #
@@ -216,7 +215,8 @@ class TmuxConfig:
         additional customizations.
         """
         self.write(
-            """#======================================================
+            """
+        #======================================================
         #
         #   Local overrides
         #
@@ -280,16 +280,6 @@ class TmuxConfig:
         #
         py_bin = run_shell("command -v python3")
 
-        # cf = tilde_home_dir(self.conf_file)
-        # w(
-        #     f'bind -N "Edit local config files"  {edit_key}  '
-        #     + 'new-window -n "$TMUX_BIN config" '
-        #     + "\"/bin/sh -c '\\${EDITOR:-vi} "
-        #     + f"{__main__.__file__} && "
-        #     + f"{py_bin} {__main__.__file__} -r {self.conf_file} && sleep 1 && "
-        #     + f"$TMUX_BIN source {self.conf_file} && "
-        #     + f'$TMUX_BIN display \\"{self.conf_file} sourced\\"\'"'
-        # )
         w(
             f'bind -N "Edit local config files"  {edit_key}  '
             + 'new-window -n "$TMUX_BIN config" '
@@ -369,7 +359,7 @@ class TmuxConfig:
 
     def list_plugin_methods(self):  # -> list[Callable[[], list[str]]]:
         """Support for plugins.py, provides a list of all plugin_... methods"""
-        plugin_mthds: list[Callable[[], list[str]]] = []
+        plugin_mthds = []
         if self.plugin_handler:
             for item in dir(self):
                 if item.find("plugin_") or item == "plugin_handler":
