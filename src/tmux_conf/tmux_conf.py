@@ -157,7 +157,11 @@ class TmuxConfig:
         self.replace_config = replace_config
         self.plugins_display = plugins_display
 
-        self.es = EmbeddedScripts(self.conf_file, self.use_embedded_scripts)
+        self.es = EmbeddedScripts(
+            conf_file=self.conf_file,
+            vers_class=self.vers,  # type: ignore
+            use_embedded_scripts=self.use_embedded_scripts
+        )
 
         #
         #  If current tmux is too old to handle tpm plugins,
