@@ -19,18 +19,23 @@ import sys
 
 from .constants import XDG_CONFIG_HOME
 from .utils import run_shell, tilde_home_dir
+from .vers_check import VersionCheck
 
 
 class EmbeddedScripts:
     """Handles scripts, either embedded or stored in scripts/ as external"""
 
-    def __init__(self, conf_file, use_embedded_scripts):
+    def __init__(
+            self,
+            conf_file,
+            vers_class: VersionCheck,
+            use_embedded_scripts):
         #  Ensure conf file is using ~ or full path if ~ not applicable
         conf_file = tilde_home_dir(conf_file)
         if conf_file[0] not in ("~", "/"):
             conf_file = tilde_home_dir(os.path.join(os.getcwd(), conf_file))
         self._conf_file = conf_file
-
+        self._vers = vers_class
         self._use_embedded_scripts = use_embedded_scripts
         self._scripts = []
         self.defined_scripts = []
@@ -96,8 +101,8 @@ class EmbeddedScripts:
 
     def run_it(self, scr_name: str, in_bg: bool = False) -> str:
         """Generate the code to run an embedded/external script"""
-        cmd = "run "
-        if in_bg:
+        cmd = "run-shell "
+        if self._vers.is_ok(1.8) and in_bg:
             cmd += "-b "
         cmd += '"'
         if self._use_embedded_scripts:
