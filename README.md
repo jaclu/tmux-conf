@@ -94,7 +94,6 @@ status bar.
 
 ```python
 
-    w = self.write
     used_plugins = self.plugins.found()
 
     if "tmux-packet-loss" in used_plugins:
@@ -103,7 +102,7 @@ status bar.
     if "tmux-prefix-highlight" in used_plugins:
         sb_right += "#{prefix_highlight}"
 
-    w(f"set -g  status-right '{sb_right}'")
+    self.write(f"set -g  status-right '{sb_right}'")
 
 ```
 
