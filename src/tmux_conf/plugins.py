@@ -299,8 +299,9 @@ class Plugins:
                 #  This is such a rare edge case that it is not worh handling
                 output += [
                     f"# plugin: {name}",
-                    "# in versions < 1.8 @variables can not be used"
-                    ]
+                    "# in versions < 1.8 @variables can not be used",
+                    "",
+                ]
 
         if self._plugin_handler == "manual":
             #
