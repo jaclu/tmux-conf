@@ -14,7 +14,7 @@ The optional [plugin](docs/PLUGINS.md) handling is also automated in the
 sense that plugins not usable on the given version of tmux are skipped.
 If any plugins are defined they will be auto-installed on first run.
 
-For tmux versions < 1.9 this will download missing plugins and initialize 
+For tmux versions < 1.9 this will download missing plugins and initialize
 them at startup, without depending on tpm. The only limitation is that
 `@params` can't be used prior to 1.8, so on really old tmux envs, plugin
 params will not be used, and plugins will use their default settings.
