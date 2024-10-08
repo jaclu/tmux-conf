@@ -1,0 +1,16 @@
+distlib           0.3.8
+filelock          3.14.0
+pbr               6.0.0
+pendulum          3.0.0
+pip               24.0
+platformdirs      4.2.1
+python-dateutil   2.9.0.post0
+setuptools        69.5.1
+six               1.16.0
+stevedore         5.2.0
+time-machine      2.14.1
+tzdata            2024.1
+virtualenv        20.26.1
+virtualenv-clone  0.5.7
+virtualenvwrapper 6.1.0
+wheel             0.43.0

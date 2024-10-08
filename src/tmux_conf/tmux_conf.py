@@ -196,6 +196,32 @@ class TmuxConfig:
 
     # ================================================================
     #
+    #  Optional overloading
+    #
+    # ================================================================
+
+    def local_overrides(self) -> None:
+        """
+        Applies local configuration overrides, executed after all other
+        configuration steps. The only exception is status bar customizations,
+        which should be handled separately in the `status_bar_customization()` method.
+
+        When overriding this method in a subclass, ensure that you call
+        `super().local_overrides()` at the start of your method to preserve
+        any configuration overrides defined by parent classes before applying
+        additional customizations.
+        """
+        self.write(
+            """#======================================================
+        #
+        #   Local overrides
+        #
+        #======================================================
+        """
+        )
+
+    # ================================================================
+    #
     #  If you prefer another edit key, call this inside your content()
     #
     #  It will be called after content and use the default edit_key
@@ -336,28 +362,6 @@ class TmuxConfig:
         #
         for line in self.es.content():
             self.write(line)
-
-    def local_overrides(self) -> None:
-        """
-        Applies local configuration overrides, executed after all other
-        configuration steps. These overrides do not affect the status bar
-        configuration (see `status_bar_customization()` for that).
-
-        When overriding this method in a subclass, ensure that
-        `super().local_overrides()` is called first, to retain any overrides
-        defined by parent classes before applying additional customizations.
-        """
-        self.write(
-            """
-
-        #======================================================
-        #
-        #   Local overrides
-        #
-        #======================================================
-        """
-        )
-        # self.write("# TmuxConfig.local_overides")
 
     def list_plugin_methods(self):  # -> list[Callable[[], list[str]]]:
         """Support for plugins.py, provides a list of all plugin_... methods"""

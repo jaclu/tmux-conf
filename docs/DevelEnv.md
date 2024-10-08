@@ -8,5 +8,6 @@ Install a reference to the live source using
 
 ```shell
 python3 -m build
+rm dist/*
 python3 -m twine upload dist/*
 ```
