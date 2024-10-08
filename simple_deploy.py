@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-#  Copyright (c) 2022: Jacob.Lundqvist@gmail.com
+#  Copyright (c) 2022,2024: Jacob.Lundqvist@gmail.com
 #  License: MIT
 #
 #  Part of https://github.com/jaclu/tmux-conf
@@ -13,6 +13,10 @@
 #  This script tries to find a local site-packages, and then just
 #  copy the relevant files there as is.
 #
+#  This should be run from the folderm where this is intended to be
+#  used, it will find the site-packages in used there and manually
+#  update that instance of tmux-conf
+
 #  I also use this when testing new versions, in order not to have
 #  to generate a local pip for every change.
 #
