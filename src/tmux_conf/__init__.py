@@ -8,6 +8,7 @@
 
 """base packet imports"""
 
+from .constants import __version__  # noqa: F401
 from .tmux_conf import TmuxConfig
 
 __all__ = ["TmuxConfig"]
