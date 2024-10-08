@@ -288,9 +288,19 @@ class Plugins:
         #
         for name, info in self._used_plugins.items():
             output.append("#------------------------------")
-            output.append(f'set -g @plugin "{name}"')
-            for line in info[2].split("\n"):
-                output.append(line.strip())
+            if self._vers.is_ok("1.8"):
+                output.append(f'set -g @plugin "{name}"')
+                for line in info[2].split("\n"):
+                    output.append(line.strip())
+            else:
+                #  prior to 1.8, any variables starting wiith @ would get tmux
+                #  stuck parsing the config file, so plugins without any such
+                #  setting could be handled by activate_plugins_mamually()
+                #  This is such a rare edge case that it is not worh handling
+                output += [
+                    f"# plugin: {name}",
+                    "# in versions < 1.8 @variables can not be used"
+                    ]
 
         if self._plugin_handler == "manual":
             #
@@ -370,10 +380,15 @@ class Plugins:
             $TMUX_BIN display "cloning  $name"
             git clone "https://github.com/$plugin" "{plugins_dir}/$name"
         fi
-        init_script="$(find "{plugins_dir}/$name" -maxdepth 1 | grep tmux$ | head -n 1)"
+        #  argh, handle softlinks to plugin folders, in order to find init...
+        d_plugin_folder="$(realpath "{plugins_dir}/$name")"
+        init_script="$(find "$d_plugin_folder" -maxdepth 1 | grep tmux$ | head -n 1)"
         if [[ -n "$init_script" ]]; then
             $TMUX_BIN display "running: $init_script"
-            $init_script || echo "ERROR in $init_script"
+            $init_script || $TMUX_BIN display "ERROR in $init_script"
+        else
+            $TMUX_BIN display "Could not find init for plugin: $name"
+            sleep 2
         fi
     done
 }}""",
