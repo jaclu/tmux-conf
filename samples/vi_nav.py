@@ -40,7 +40,7 @@ class ViNav(TmuxConfig):
         #  This check only considers if the plugin is defined, not if
         #  it has actually been installed.
         #
-        if "tmux-prefix-highlight" in self.plugins.found():
+        if "tmux-prefix-highlight" in self.plugins.installed():
             w("set -g  status-right '#{prefix_highlight}'")
 
         w(

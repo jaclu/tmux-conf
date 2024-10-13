@@ -2,6 +2,16 @@
 *~
 *#
 
+# vscode
+*.code-workspace
+
+### VisualStudioCode ###
+.vscode/* # Maybe .vscode/**/* instead - see comments
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
 # olint linter config
 .cache.olint
 
@@ -10,11 +20,6 @@ other/
 # MacOS cruft
 .DS_STORE
 
-# vscode
-.vscode/
-*.code-workspace
-
-# settings.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

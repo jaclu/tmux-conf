@@ -83,17 +83,6 @@ class Plugins:
     #     """
     #     return
 
-    def found(self, short_name: bool = True):
-        """OBSOLETE! replaced ny installed()
-        TODO: Remove this function!
-        Returns a list of plugin names being used.
-        If short_name is False will return the full name including
-        source, this is needed when cloning the repo, but less desired
-        when just checking if a given plugin is used in most cases.
-        Since if a different fork of it is being used, the name would
-        not match."""
-        return self.installed(short_name=short_name)
-
     def installed(self, short_name: bool = True):
         """Returns a list of plugin names being installed.
         This excludes defined but not already installed plugins.
@@ -362,7 +351,7 @@ class Plugins:
         )
         plugins_dir, _ = self.get_env()
         plugins = ""
-        for p in self.found(short_name=False):
+        for p in self.installed(short_name=False):
             plugins += " " + p
 
         activate_manually_sh = [

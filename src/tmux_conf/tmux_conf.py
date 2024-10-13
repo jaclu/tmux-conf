@@ -334,7 +334,7 @@ class TmuxConfig:
         #  how to override the edit key
         #
         self.edit_config()
-        if self.plugin_handler and self.plugins.found():
+        if self.plugin_handler and self.plugins.installed():
             w(
                 """#======================================================
             #
