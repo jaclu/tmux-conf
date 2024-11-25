@@ -38,6 +38,7 @@ from .utils import (
 from .vers_check import VersionCheck
 
 
+# pylint: disable=too-many-instance-attributes,too-many-public-methods
 class TmuxConfig:
     """Class that generates a .tmux.conf"""
 
@@ -86,6 +87,7 @@ class TmuxConfig:
 
     lib_version: str = __version__
 
+    # pylint: disable=too-many-arguments,too-many-positional-arguments
     def __init__(
         self,
         parse_cmd_line: bool = True,
@@ -569,7 +571,6 @@ class TmuxConfig:
             #  tmux not found abort
             print("ERROR could not find tmux binary, aborting")
             sys.exit(1)
-        return
 
     def find_cmd_1(self) -> str:
         """First check is to see if the tmux used to generate the

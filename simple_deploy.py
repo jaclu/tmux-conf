@@ -41,20 +41,20 @@ for p in sys.path[:-1]:
         os.chdir(os.path.dirname(__main__.__file__))
 
         DIR_SRC = "src/tmux_conf"
-        dir_dest = f"{p}/tmux_conf"
-        # os.remove(f'{dir_dest}*dist-info')
-        if not os.path.isdir(dir_dest):
-            print(f"ERROR: dir {dir_dest} does not exist!")
+        DIR_DEST = f"{p}/tmux_conf"
+        # os.remove(f'{DIR_DEST}*dist-info')
+        if not os.path.isdir(DIR_DEST):
+            print(f"ERROR: dir {DIR_DEST} does not exist!")
             sys.exit(1)
-        shutil.copy(f"{DIR_SRC}/__init__.py", dir_dest)
-        shutil.copy(f"{DIR_SRC}/constants.py", dir_dest)
-        shutil.copy(f"{DIR_SRC}/embedded_scripts.py", dir_dest)
-        shutil.copy(f"{DIR_SRC}/plugins.py", dir_dest)
-        shutil.copy(f"{DIR_SRC}/tmux_conf.py", dir_dest)
-        shutil.copy(f"{DIR_SRC}/utils.py", dir_dest)
-        shutil.copy(f"{DIR_SRC}/vers_check.py", dir_dest)
-        shutil.copy(f"{DIR_SRC}/exceptions.py", dir_dest)
-        print(f"Copied tmux_conf files to user {dir_dest}")
+        shutil.copy(f"{DIR_SRC}/__init__.py", DIR_DEST)
+        shutil.copy(f"{DIR_SRC}/constants.py", DIR_DEST)
+        shutil.copy(f"{DIR_SRC}/embedded_scripts.py", DIR_DEST)
+        shutil.copy(f"{DIR_SRC}/plugins.py", DIR_DEST)
+        shutil.copy(f"{DIR_SRC}/tmux_conf.py", DIR_DEST)
+        shutil.copy(f"{DIR_SRC}/utils.py", DIR_DEST)
+        shutil.copy(f"{DIR_SRC}/vers_check.py", DIR_DEST)
+        shutil.copy(f"{DIR_SRC}/exceptions.py", DIR_DEST)
+        print(f"Copied tmux_conf files to user {DIR_DEST}")
         sys.exit(0)
     else:
         print(f"Skipping {p}")

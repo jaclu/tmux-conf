@@ -40,9 +40,11 @@ class Plugin:
 #
 #  Tasks related to plugins, taken separately to keep files smaller
 #
+# pylint: disable=too-many-instance-attributes
 class Plugins:
     """Class that handles tmux plugins"""
 
+    # pylint: disable=too-many-arguments,too-many-positional-arguments
     def __init__(
         self,
         conf_file: str,  # must use tilde for home dir
@@ -149,6 +151,7 @@ class Plugins:
                 self._skipped_plugins.append((str(vers_min), plugin_name))
         self._skipped_plugins.sort()
 
+    # pylint: disable=too-many-branches
     def display_info(self) -> str:
         """List selected and ignored plugins, depending on param"""
         print(f"\n\t=====  tmux {self._vers.get()} - Plugins defined  =====")
