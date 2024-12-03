@@ -21,6 +21,13 @@
 #  to generate a local pip for every change.
 #
 
+"""Simple deploy
+
+This is mostly for iSH and other super slow nodes where just doing
+pip install tmux-conf would take 5-10 minutes.
+this directly copies the relevant files into the used site-packages.
+"""
+
 import os
 import shutil
 import sys

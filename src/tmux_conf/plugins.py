@@ -9,7 +9,7 @@
 #  See the README.md in the repository for more info
 #
 
-""" Class that handles tmux plugins """
+"""Class that handles tmux plugins"""
 
 import os
 import shutil
@@ -32,6 +32,8 @@ PLUGIN_STATIC_CODE = 2
 
 @dataclass
 class Plugin:
+    """Handles tmux plugins"""
+
     vers_min: str
     plug_def: Callable[[bool], bool]
     code: str

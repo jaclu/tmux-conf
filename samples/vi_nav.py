@@ -10,6 +10,7 @@ tmux version. And defining some plugins of various complexity
 
 Also shows various methods to define plugins
 """
+
 import sys
 
 try:
@@ -20,7 +21,10 @@ except ModuleNotFoundError:
 
 
 class ViNav(TmuxConfig):
+    """Sample tmux.conf generator"""
+
     def content(self):
+        """Generates the main content for the tmux.conf"""
         w = self.write  # short alias for write
 
         prefix_key = "C-w"
@@ -66,12 +70,14 @@ class ViNav(TmuxConfig):
         )
 
     def plugin_yank(self):
+        """Uses plugin tmux-plugins/tmux-yank"""
         #
         # case 1: No settings for the plugin
         #
         return ["tmux-plugins/tmux-yank", 1.5, ""]
 
     def plugin_prefix_highlight(self):
+        """Uses plugin tmux-plugins/tmux-prefix-highlight"""
         #
         #  case 2: Static options can just be returned
         #
@@ -87,6 +93,7 @@ class ViNav(TmuxConfig):
         ]
 
     def plugin_menus(self):
+        """Uses plugin jaclu/tmux-menus"""
         #
         #  case 3: Dynamic options are defined inside the method.
         #

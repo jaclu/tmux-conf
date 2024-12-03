@@ -9,13 +9,18 @@
 #  usable for tmux, sole purpose is to explore version checks.
 #
 
+"""Generates a minimal tmux.conf, demonstating how version check can be used"""
+
 # pylint: disable=import-error
 from tmux_conf import TmuxConfig
 
 
 # pylint: disable=too-few-public-methods
 class DummyConfig(TmuxConfig):
+    """Dummy config class demonstrating vers_ok()"""
+
     def content(self):
+        """Generates the main content for the tmux.conf"""
         w = self.write  # shortcut for writes
 
         w("# vvvvv   Version checked item below this   vvvvv")
