@@ -14,8 +14,8 @@
 import os
 import shutil
 import sys
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable, Dict, Tuple
 
 import __main__
 
@@ -26,8 +26,6 @@ from .vers_check import VersionCheck
 PLUGIN_VERS_MIN = 0
 PLUGIN_MTHD = 1
 PLUGIN_STATIC_CODE = 2
-
-# str, Tuple[str, Callable[[], list[str]], str]
 
 
 @dataclass
@@ -63,10 +61,10 @@ class Plugins:
 
         self._is_limited_host = False
 
-        self._used_plugins: Dict[str, Tuple[str, Callable[[], list[str]], str]] = {}
+        self._used_plugins: dict[str, tuple[str, Callable[[], list[str]], str]] = {}
 
         # plugins incompatible with this version
-        self._skipped_plugins: list[Tuple[str, str]] = []
+        self._skipped_plugins: list[tuple[str, str]] = []
 
         self._fnc_activate_tpm = "activate_tpm"
         self._fnc_activate_manually = "activate_plugins_mamually"
