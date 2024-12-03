@@ -1,18 +1,16 @@
 [project]
 name = "tmux_conf"
 version = "0.17.4"
-authors = [
-  { name="Jacob Lundqvist", email="Jacob.Lundqvist@gmail.com" },
-]
+authors = [{ name = "Jacob Lundqvist", email = "Jacob.Lundqvist@gmail.com" }]
 description = "Generates version checked tmux conf"
 readme = "README.md"
 requires-python = ">=3.7"
 keywords = ["tmux", "automation"]
 
 classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
 ]
 
 [project.urls]
@@ -45,7 +43,7 @@ requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.black]
-line-length = 88
+line-length = 92
 include = '\.pyi?$'
 exclude = '''
 
@@ -69,7 +67,7 @@ exclude = '''
 '''
 
 [tool.flake8]
-max-line-length = 88
+max-line-length = 92
 extend-ignore = "E203, W503"
 
 [tool.isort]
