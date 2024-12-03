@@ -3,13 +3,18 @@
 Methods starting with `plugin_` define plugins. They return:
 
 1. Name of plugin to be installed
-1. minimum tmux version for this plugin
-1. Assignments of plugin variables etc
+1. minimum tmux version for this plugin. Normally if tmux vers is lover than
+the minimum version, this plugin will be listed as ignored.
+To completely skip a plugin, use min version: -1.
+1. tmux code snippet handling assignments of plugin variables etc
 
 Any method starting with plugin\_ will be assumed to be a plugin
 definition, and handled as such by the TmuxConfig class.
 
-Plugins will be ordered alphabetically based on method name.
+## Plugin usage order
+
+Plugins will be placed in tmux.conf in alphabetical order based on method name.
+
 Normally the order does not matter, but if there is a corner case
 renaming the plugin method is enough to change the order.
 For example tmux-continuum stated a while back that their plugin
@@ -17,47 +22,94 @@ should be last or at least as late as possible
 
 ```python
 
-    def plugin_zz_continuum(self):
+    def plugin_zz_continuum(self) -> list:  # 1.9
+        """Automatically save and restore tmux server's open sessions.
 
-        #  2020-12-24
-        #  ==========
-        #  (From their repo) Due to a bug tmux-continuum should be as close
-        #  to last plugin as possible to minimize the risk of a crucial tmux
-        # variable `status-right` is not overwritten (usually by theme plugins).
-        #
-        return ["tmux-plugins/tmux-continuum",
-        1.9,
+        Depends on the plugin tmux-resurrect for actual save/restore.
+
+        Due to a "known issue" mentioned on the plugins GitHub page, this
+        plugin method name is intended to make sure this is the last
+        plugin defined. Here is this issue:
+
+        In order to be executed periodically, the plugin updates the
+        status-right tmux variable. In case some plugin (usually themes)
+        overwrites the status-right variable, the autosave feature stops
+        working. To fix this issue, place the plugin last in the TPM plugins list.
         """
-        set -g @continuum-restore        on
+        conf = """
         set -g @continuum-save-interval  15
-        """]
+        set -g @continuum-restore        on
+        """
+        return ["tmux-plugins/tmux-continuum", 1.9, conf]
+
 
 ```
 
-If not in one of the parent classes, just changing the name to something
-like not_plugin_foo() is enough to ensure it is not used.
+## Skipping a plugin
 
-If it is defined in a parent class, redefining it with a ridiculously high min
-version, will prevent that plugin from being used.
+Normally if the running tmux doesnt match the min_version for a plugin,
+it will be listed as an ignored plugin, and if it matches the plugin will be used.
 
-Since such a plugin will never be used, it does not need any meaningful content
-in the third param, here is an example:
+If a config decides that a plugin should not be used at all, such as:
+
+- a music player would be pointless to use on a cloud host
+- if running on iSH or other environments with limited resources
+- if a sub-class simply does not want to use this one
+
+Setting `vers_min = -1`, means that this plugin will be entirely skipped,
+and not listed as ignored.
+
+-1.0 is also supported, since often when `vers_min` is used in an `if-else` clause,
+the other option is a float.
+
+In such cases using -1.0 ensures linters wont
+complain about `"Incompatible types in assignment"`
+
+### Skipping a plugin in a sub-class
+
+If it is defined in a parent class, redefining it with a min version of -1
+in a sub-class will result that this plugin is entirely skipped.
 
 ```python
 
-def plugin_packet_loss(self):
-    #  Dummy to override base class instance.
-    #  The plugin name below has no significance for
-    #  ignored plugins, it can be empty, but it might make sense
-    #  to use a meaningful name. This will make you aware of what plugin was disabled.
-    return ["jaclu/tmux-packet-loss", 99, ""]
+    def plugin_packet_loss(self):
+        """Dummy to override base class instance.
+        The plugin name below has no significance for ignored plugins,
+        it can be empty, but it might make sense to use a meaningful name.
+        This will make it easy to see exactly what plugin was disabled."""
+        return ["jaclu/tmux-packet-loss", -1, ""]
+
+```
+
+### Making a plugin definition context aware
+
+I use two tmux envs, often running the secondary inside the outer.
+
+For some plugins it wouldn't make sense to be used in an inner tmux.
+Another concern could be that plugins might be resource intensive, thus
+unsuitable for limited environments, or not usable for tmate etc.
+
+For such plugins an env condition can be made, and if this plugin should
+not be used in this case, setting `min_vers = -1.0` will skip it.
+
+```python
+
+    def plugin_session_wizard(self) -> list:
+        if self.skip_plugin_session_wizard or (
+            self.t2_env or self.is_ish or self.is_termux or self.is_tmate
+        ):
+            vers_min = -1.0  # Dont use
+        else:
+            vers_min = 3.2  # Actual min vers, checked vs running tmux
+        return ["27medkamal/tmux-session-wizard", vers_min, ""]
 
 ```
 
 ## Really old tmux versions
 
 tpm requires version 1.9, for older versions if a plugin handler is
-defined, it is changed into manual. This should work on any tmux.
+defined, it is changed into manual. This makes pluguin handling possible
+for any version of tmux.
 
 ## Sample config
 

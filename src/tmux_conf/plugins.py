@@ -42,7 +42,27 @@ class Plugin:
 #
 # pylint: disable=too-many-instance-attributes
 class Plugins:
-    """Class that handles tmux plugins"""
+    """Class that handles tmux plugins
+
+    Normally if the running tmux doesnt match the min_version for a plugin,
+    it will be listed as an ignored plugin, and if it matches
+    the plugin will be used.
+
+    If a config decides that a plugin should not be used at all, such as:
+
+    - a music player would be pointless to use on a cloud host
+    - if running on iSH or other environments with limited resources
+    - if a sub-class simply does not want to use this one
+
+    vers_min = -1
+    Means that this plugin will be entirely skipped, and not listed as ignored.
+
+    -1.0 is also supported, since often when `vers_min` is used in
+    an `if-else` clause, the other option is a float.
+
+    In such cases using -1.0 ensures linters wont
+    complain about `"Incompatible types in assignment"`
+    """
 
     # pylint: disable=too-many-arguments,too-many-positional-arguments
     def __init__(
@@ -130,7 +150,8 @@ class Plugins:
 
     def scan(self, plugin_methods):  # list[Callable[[], list[str]]]) -> None:
         """Investigate all defined plugin methods, and determine if a
-        given plugin can be used depending on running tmux"""
+        given plugin can be used depending on running tmux, or if it should be skipped
+        """
         duplicate_check = []
         for plugin_mthd in plugin_methods:
             plugin_name, vers_min, code = plugin_mthd()
@@ -139,16 +160,19 @@ class Plugins:
                 sys.exit(1)
             else:
                 duplicate_check.append(plugin_name)
-            #  Since plugi method might define vers_min as a float
-            #  we need to convert it to a string both for used and ignored plugins
-            if self._vers.is_ok(vers_min):
+            #  Since plugin method might define vers_min as a float or int
+            #  it needs to be converted to a string for plugin handling
+            s_vers_min = str(vers_min)
+            if s_vers_min in ("-1", "-1.0"):
+                continue  # skip it entirely
+            if self._vers.is_ok(s_vers_min):
                 self._used_plugins[plugin_name] = (
-                    str(vers_min),  # PLUGIN_VERS_MIN
+                    s_vers_min,  # PLUGIN_VERS_MIN
                     plugin_mthd,  # PLUGIN_MTHD
                     code,  # PLUGIN_STATIC_CODE
                 )
             else:
-                self._skipped_plugins.append((str(vers_min), plugin_name))
+                self._skipped_plugins.append((s_vers_min, plugin_name))
         self._skipped_plugins.sort()
 
     # pylint: disable=too-many-branches
