@@ -88,9 +88,7 @@ def parse_cmdline(args):
         help="1=Used plugins 2=also ignored plugins 3=show config",
     )
 
-    parser.add_argument(
-        "-t", "--tmux_bin", help="Force usage of this tmux bin", default=""
-    )
+    parser.add_argument("-t", "--tmux_bin", help="Force usage of this tmux bin", default="")
 
     parser.add_argument(
         "-V",
@@ -111,7 +109,10 @@ def run_shell(cmd: str) -> str:
     """Run a command in a shell"""
     # pylint: disable=subprocess-run-check
     result = subprocess.run(
-        cmd, capture_output=True, text=True, shell=True  # nosec: B602
+        cmd,
+        capture_output=True,
+        text=True,
+        shell=True,  # nosec: B602
     )
     return result.stdout.strip()
 

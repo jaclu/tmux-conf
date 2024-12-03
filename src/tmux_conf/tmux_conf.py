@@ -37,8 +37,7 @@ from .utils import (
 )
 from .vers_check import VersionCheck
 
-
-# pylint: disable=too-many-instance-attributes,too-many-public-methods
+# pylint: disable=too-many-arguments,too-many-instance-attributes,too-many-public-methods
 class TmuxConfig:
     """Class that generates a .tmux.conf"""
 
@@ -181,9 +180,7 @@ class TmuxConfig:
             clear_plugins=clear_plugins,
             plugins_display=plugins_display,
         )
-        self.write_enable(
-            False
-        )  # Allow plugin cheks to run without writung to conf file
+        self.write_enable(False)  # Allow plugin cheks to run without writung to conf file
 
     # ================================================================
     #
@@ -533,9 +530,7 @@ class TmuxConfig:
 
     def check_replace_default_config(self) -> None:
         if os.path.isfile(self.conf_file) or os.path.islink(self.conf_file):
-            confirmation = input(
-                "Do you wish to replace the default config file (y/n)?"
-            )
+            confirmation = input("Do you wish to replace the default config file (y/n)?")
         else:
             confirmation = input("Do you wish to create a default config file (y/n)?")
         if confirmation not in ("y", "Y"):
