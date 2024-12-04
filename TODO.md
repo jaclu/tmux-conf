@@ -11,13 +11,13 @@ assign_tmux_bin(tmux_bin="tmux"):
     parts = run_shell(f"{tmux_bin} -V").split(" ")
     if len(parts) != 2 or parts[0] not in ("tmux", "tmate"):
         if verbose:
-            print("{tmux} Doesnt seem to be a tmux binary")
+            print("{tmux} Doesn't seem to be a tmux binary")
         return False
     try:
         maj,min = extract_tmux_vers(parts[1])
     except NOT_TMUX_VERS:
         if verbose:
-            print("{parts[[1]} Doesnt seem to be a valid tmux version")
+            print("{parts[[1]} Doesn't seem to be a valid tmux version")
         return False
     self.tmux_bin = tmux_bin
     self.vers_maj = maj

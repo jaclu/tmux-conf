@@ -120,7 +120,7 @@ def run_shell(cmd: str) -> str:
 def tilde_home_dir(path: str) -> str:
     """Converts full path to ~ notation
     Internally all path related variables are stored expanded for python
-    readability. I try to allways use this when writing paths to the
+    readability. I try to always use this when writing paths to the
     config file, to keep it generic"""
     path = os.path.expanduser(path)
     home_dir = os.path.expanduser("~")

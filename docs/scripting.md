@@ -77,7 +77,7 @@ embedded or external
 ...
 ```
 
-With `use_embedded_scripts = True` the script will be refered as a local
+With `use_embedded_scripts = True` the script will be referred as a local
 function:
 
 ```bash
@@ -86,7 +86,7 @@ toggle_mouse
 ...
 ```
 
-With `use_embedded_scripts = False` the script will be refered with
+With `use_embedded_scripts = False` the script will be referred with
 absolute path and suffix:
 
 ```bash

@@ -114,7 +114,7 @@ def not_test_tc_find_tmux_bin():
 
 
 #
-#  Cant be run inside VSCode ATM...
+#  Can't be run inside VSCode ATM...
 #
 # cfb = os.environ.get("__CFBundleIdentifier")
 # if not cfb or cfb.find("VSCode") < 0:
@@ -158,7 +158,7 @@ def not_test_tc_btick():
 
 
 # def not_test_tc_note_as_comment():
-#     #  Also ensure spaces > 2 after note are disgarded
+#     #  Also ensure spaces > 2 after note are discarded
 #     tc = tc_env()
 #     tc.define_tmux_vers(vers="2.8")
 #     assert tc.filter_note("bind -N 'This is a note'    a display 'that was a'") == [
@@ -192,7 +192,7 @@ def not_test_tc_btick():
 
 
 # def not_test_tc_note_extra_N_is_purged():
-#     #  Ensure extra -N is disgarded
+#     #  Ensure extra -N is discarded
 #     note = "missing feature"
 #     cmd = "dummy line"
 #     cmd_rest = 'M display "mouse toggle needs 2.1"'
@@ -239,7 +239,7 @@ def not_test_tc_conf_file_create_default(capfd):
 def not_test_tc_conf_file_no_write(capfd):
     if os.path.isdir("/proc/ish"):
         #
-        #  iSH doesn't have propper file privs, so will allow user writes
+        #  iSH doesn't have proper file privs, so will allow user writes
         #  to read only paths
         #
         pytest.skip("skipping test not working on iSH")

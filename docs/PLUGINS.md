@@ -47,7 +47,7 @@ should be last or at least as late as possible
 
 ## Skipping a plugin
 
-Normally if the running tmux doesnt match the min_version for a plugin,
+Normally if the running tmux doesn't match the min_version for a plugin,
 it will be listed as an ignored plugin, and if it matches the plugin will be used.
 
 If a config decides that a plugin should not be used at all, such as:
@@ -62,7 +62,7 @@ and not listed as ignored.
 -1.0 is also supported, since often when `vers_min` is used in an `if-else` clause,
 the other option is a float.
 
-In such cases using -1.0 ensures linters wont
+In such cases using -1.0 ensures linters won't
 complain about `"Incompatible types in assignment"`
 
 ### Skipping a plugin in a sub-class

@@ -141,7 +141,7 @@ class EmbeddedScripts:
         #"""
         ]
         #
-        #  Embedded scripts starts at column 3, insert extra indention on
+        #  Embedded scripts starts at column 3, insert extra indentation on
         #  each line
         #
         for script_line in self._scripts:

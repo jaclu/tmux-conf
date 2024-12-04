@@ -37,6 +37,7 @@ from .utils import (
 )
 from .vers_check import VersionCheck
 
+
 # pylint: disable=too-many-arguments,too-many-instance-attributes,too-many-public-methods
 class TmuxConfig:
     """Class that generates a .tmux.conf"""
@@ -78,7 +79,7 @@ class TmuxConfig:
     #  The only usage of this in this package is to propagate it to
     #  the plugin handler, indicating as plugins are installed and
     #  activated, since this might take a noticeable time on slower nodes.
-    #  It is also avaiable in derived plugin_ methods
+    #  It is also available in derived plugin_ methods
     #
     #  Other usages of this is up to implementation classes
     #
@@ -112,7 +113,7 @@ class TmuxConfig:
 
         self.tmux_bin = ""
 
-        #  cant use self.is_tmate() at this point, since self.tmux_bin
+        #  can't use self.is_tmate() at this point, since self.tmux_bin
         #  is not yet set
         if tmux_bin.find("tmate") > -1:
             #  Set tmate defaults
@@ -180,7 +181,7 @@ class TmuxConfig:
             clear_plugins=clear_plugins,
             plugins_display=plugins_display,
         )
-        self.write_enable(False)  # Allow plugin cheks to run without writung to conf file
+        self.write_enable(False)  # Allow plugin checks to run without writung to conf file
 
     # ================================================================
     #
@@ -409,7 +410,7 @@ class TmuxConfig:
 
         #
         #  When you might use various tmux instances or tmux is not in
-        #  path, the safe bet is to allways use $TMUX_BIN in a shell, not tmux!
+        #  path, the safe bet is to always use $TMUX_BIN in a shell, not tmux!
         #
         TMUX_BIN="{self.tmux_bin}"
 
@@ -493,7 +494,7 @@ class TmuxConfig:
         pre = parts[0].strip()
         post = parts[1].strip()
         if not post:
-            # Propably an -N at end of line, so not related to a note
+            # Probably an -N at end of line, so not related to a note
             return [pre]
         p0 = post[0]
         if p0 in {'"', "'"}:
@@ -548,7 +549,7 @@ class TmuxConfig:
     #
     def find_tmux_bin(self, cmd: str = "", requested_vers: str = "") -> None:
         """if tmux should use a specific version, when generating config
-        set requested_vers parameter, if empy the actual version is used
+        set requested_vers parameter, if empty the actual version is used
         if found, will set self.tmux_bin and more
         if not Raises exception
         """
@@ -605,11 +606,11 @@ class TmuxConfig:
         """
         parts = run_shell(f"{tmux_bin} -V").split(" ")
         if len(parts) != 2 or parts[0] not in ("tmux", "tmate"):
-            raise TmuxConfNotTmuxCommand(f"{tmux_bin} Doesnt seem to be a tmux binary")
+            raise TmuxConfNotTmuxCommand(f"{tmux_bin} Doesn't seem to be a tmux binary")
 
         vers = VersionCheck(actual_vers=parts[1], requested_vers=requested_vers)
         # except TmuxConfInvalidTmuxVersion:
-        #     print("{parts[[1]} Doesnt seem to be a valid tmux version")
+        #     print("{parts[[1]} Doesn't seem to be a valid tmux version")
         #     return False
         self.tmux_bin = tmux_bin
         # pylint: disable=W0201
@@ -625,7 +626,7 @@ class TmuxConfig:
         not to expand an asdf path that has already been processed!
 
         Any process starting in the same dir as tmux was started will
-        inherrit potential local asdf tmux selection, but processes
+        inherit potential local asdf tmux selection, but processes
         starting in other dirs will use asdf default version.
         By expanding the initial shim into a full path,
         the correct tmux will be used in all cases.

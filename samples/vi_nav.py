@@ -40,7 +40,7 @@ class ViNav(TmuxConfig):
             w("set -as terminal-features 'xterm*:extkeys'")
 
         #
-        #  Only add item if dependant plugin is listed.
+        #  Only add item if dependent plugin is listed.
         #  This check only considers if the plugin is defined, not if
         #  it has actually been installed.
         #

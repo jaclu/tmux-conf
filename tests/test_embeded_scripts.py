@@ -112,7 +112,7 @@ def not_test_es_content():
         errors.append(f"Bad script name line: {cont[1]}")
     if cont[3] != '#     echo "Hello world"':
         errors.append(f"Bad echo: {cont[2]}")
-    assert not errors, "errors occured:\n{}".format("\n".join(errors))
+    assert not errors, "errors occurred:\n{}".format("\n".join(errors))
 
 
 def not_test_es_get_dir_embedded():

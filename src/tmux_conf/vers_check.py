@@ -56,7 +56,7 @@ class VersionCheck:
         When given as int .0 is appended
         In many cases a float is sufficient, like 2.8, 3.0 etc
         Some versions have character suffixes like 3.3a, then a string
-        param is needed. Internally version refs are allways treated as
+        param is needed. Internally version refs are always treated as
         strings.
         """
         a, b = self.normalize_vers(vers).split(".")

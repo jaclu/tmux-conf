@@ -44,7 +44,7 @@ class Plugin:
 class Plugins:
     """Class that handles tmux plugins
 
-    Normally if the running tmux doesnt match the min_version for a plugin,
+    Normally if the running tmux doesn't match the min_version for a plugin,
     it will be listed as an ignored plugin, and if it matches
     the plugin will be used.
 
@@ -60,7 +60,7 @@ class Plugins:
     -1.0 is also supported, since often when `vers_min` is used in
     an `if-else` clause, the other option is a float.
 
-    In such cases using -1.0 ensures linters wont
+    In such cases using -1.0 ensures linters won't
     complain about `"Incompatible types in assignment"`
     """
 
@@ -224,7 +224,7 @@ class Plugins:
                 )
                 info[1]()  # PLUGIN_MTHD
                 #
-                #  Skip indention, for easier read
+                #  Skip indentation, for easier read
                 #
                 for line in info[2].split("\n"):  # PLUGIN_STATIC_CODE
                     # if line == line.strip():

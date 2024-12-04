@@ -9,7 +9,7 @@
 #  usable for tmux, sole purpose is to explore version checks.
 #
 
-"""Generates a minimal tmux.conf, demonstating how version check can be used"""
+"""Generates a minimal tmux.conf, demonstrating how version check can be used"""
 
 # pylint: disable=import-error
 from tmux_conf import TmuxConfig
@@ -37,7 +37,7 @@ class DummyConfig(TmuxConfig):
         min_version = "2.4"
 
         if self.vers_ok(min_version):
-            w("# Accepable version")
+            w("# Acceptable version")
         else:
             w("# tmux to old")
 

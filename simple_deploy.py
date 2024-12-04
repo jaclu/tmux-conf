@@ -8,7 +8,7 @@
 #  Copies files directly to user site-packages, should not be used
 #  as a primary deploy method!
 #
-#  Mostly for iSH, when instlling a pip or building it locally
+#  Mostly for iSH, when installing a pip or building it locally
 #  would take for ever.
 #  This script tries to find a local site-packages, and then just
 #  copy the relevant files there as is.
