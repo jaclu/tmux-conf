@@ -14,6 +14,8 @@
 import os
 import shutil
 import sys
+
+# pylint: disable=import-error
 from collections.abc import Callable
 from dataclasses import dataclass
 

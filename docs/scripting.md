@@ -5,7 +5,9 @@ tends to be error prone and rather complex, so therefore support for
 normal scripts is included. Either embedded or stored in separate
 files.
 
-[src/tmux_conf/embedded_scripts.py](https://github.com/jaclu/tmux-conf/blob/main/src/tmux_conf/embedded_scripts.py) handles scripting
+[src/tmux_conf/embedded_scripts.py](
+https://github.com/jaclu/tmux-conf/blob/main/src/tmux_conf/embedded_scripts.py)
+handles scripting
 
 ## Defining scripts
 
