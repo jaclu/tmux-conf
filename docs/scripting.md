@@ -138,11 +138,12 @@ some considerations about handling backticks must be made.
 Any un-escaped backticks in the conf file will cause embedded scripts to
 fail. This is the case both for tmux code and comments.
 
-If not preceded by a backslash, it would tell any embedded scripts that this indicates
-a start of a shell command. If it is outside the scope of the function it is about to run,
-it would never run that snippet, but if there is not another matching backtick indicating the
-end of this "shell-command", it will lead to failure reading the script,
-and be treated as a syntax error.
+If not preceded by a backslash, it would tell any embedded scripts that this
+indicates a start of a shell command.
+If it is outside the scope of the function it is about to run,
+it would never run that snippet, but if there is not another matching
+backtick indicating the end of this "shell-command",
+it will lead to failure reading the script, and be treated as a syntax error.
 
 Any backtick must use \\\` notation in the final conf file.
 Not "\`" or '\`'.

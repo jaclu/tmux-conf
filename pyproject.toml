@@ -91,6 +91,13 @@ warn_unreachable = true
 warn_unused_configs = true
 no_implicit_reexport = true
 
+[tool.pymarkdown]
+# plugins.no-inline-html.enabled = false
+#plugins.line-length.enabled = false
+# plugins.line-length.line_length = 92
+plugins.line-length.code_block_line_length = 92
+#plugins.md033.allowed_elements = "nbsp,prefix"
+
 [tool.pytest]
 addopts = "-ra -q --strict"
 python_files = ["tests/test_*.py"]
