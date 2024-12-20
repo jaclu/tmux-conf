@@ -98,7 +98,7 @@ not be used in this case, setting `min_vers = -1.0` will skip it.
         if self.skip_plugin_session_wizard or (
             self.t2_env or self.is_ish or self.is_termux or self.is_tmate
         ):
-            vers_min = -1.0  # Dont use
+            vers_min = -1.0  # Don't use
         else:
             vers_min = 3.2  # Actual min vers, checked vs running tmux
         return ["27medkamal/tmux-session-wizard", vers_min, ""]

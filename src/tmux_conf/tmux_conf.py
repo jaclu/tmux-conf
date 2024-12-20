@@ -53,7 +53,7 @@ class TmuxConfig:
     #  processed
     #
     #  set this to 'jaclu/tpm' if you want to try that one!
-    #  set it to "manual" if you dont want to use tpm.
+    #  set it to "manual" if you don't want to use tpm.
     #  set it to '' if you do not want to use plugins at all.
     #
     plugin_handler: str = "tmux-plugins/tpm"

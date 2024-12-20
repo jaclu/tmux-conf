@@ -22,7 +22,7 @@ class WithContent(TmuxConfig):
 
 class NotEmbedded(WithContent):
     """We combine not embedded and content in the same class.
-    They are used for separate tests so they dont overlap,
+    They are used for separate tests so they don't overlap,
     just handy to use a single class"""
 
     use_embedded_scripts = False
