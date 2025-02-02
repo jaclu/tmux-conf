@@ -31,7 +31,7 @@ def btick_unescaped(line: str) -> bool:
     if line[pos - 1] != "\\":
         return True  # Was nor escaped
     #
-    # recurse to check rest of l§ine
+    # recurse to check rest of line
     #
     resume_pos = pos + 1
     return btick_unescaped(line[resume_pos:])

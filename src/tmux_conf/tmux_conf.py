@@ -181,7 +181,7 @@ class TmuxConfig:
             clear_plugins=clear_plugins,
             plugins_display=plugins_display,
         )
-        self.write_enable(False)  # Allow plugin checks to run without writung to conf file
+        self.write_enable(False)  # Allow plugin checks to run without writng to conf file
 
     # ================================================================
     #
