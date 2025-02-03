@@ -21,6 +21,8 @@ from .constants import XDG_CONFIG_HOME
 from .utils import run_shell, tilde_home_dir
 from .vers_check import VersionCheck
 
+# from typing import Union
+
 
 class EmbeddedScripts:
     """Handles scripts, either embedded or stored in scripts/ as external"""
@@ -127,7 +129,7 @@ class EmbeddedScripts:
             cmd = f"{self.get_dir()}/{scr_name}.sh"
         return cmd
 
-    def content(self):
+    def content(self) -> list[str]:
         """Generates the code for embedded scripts to be written to
         the conf file"""
         if not (self._use_embedded_scripts and self._scripts):

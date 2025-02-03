@@ -20,6 +20,7 @@ import datetime
 import os
 import shutil
 import sys
+from typing import Union
 
 import __main__
 
@@ -129,6 +130,7 @@ class TmuxConfig:
                 self.plugin_handler = "manual"
 
         self.e_c_has_been_called = False
+        self._write_enabled = False
         self._write_stdout = False
 
         print(f"Processing: {__main__.__file__}")
@@ -181,7 +183,6 @@ class TmuxConfig:
             clear_plugins=clear_plugins,
             plugins_display=plugins_display,
         )
-        self.write_enable(False)  # Allow plugin checks to run without writing to conf file
 
     # ================================================================
     #
@@ -334,6 +335,7 @@ class TmuxConfig:
         #  how to override the edit key
         #
         self.edit_config()
+
         if self.plugin_handler and self.plugins.installed():
             w(
                 """#======================================================
@@ -342,20 +344,20 @@ class TmuxConfig:
             #
             # ======================================================\n"""
             )
-            for line in self.plugins.parse():
-                if isinstance(line, list):
-                    for sub_line in line:
-                        self.write(sub_line)
-                else:
-                    self.write(line)
+            self.write(self.plugins.parse())
 
+        #
+        #  Local overrides should happen as late as possible, but still _before_
+        #  tpm is triggered, to make sure overrides get processed.
+        #
         self.local_overrides()
+        self.write(self.plugins.deploy_plugin_handler())
+
         #
         #  Should be called as late as possible, to be able to have
         #  gathered all the intended embedded scripts.
         #
-        for line in self.es.content():
-            self.write(line)
+        self.write(self.es.content())
 
     def list_plugin_methods(self):  # -> list[Callable[[], list[str]]]:
         """Support for plugins.py, provides a list of all plugin_... methods"""
@@ -432,7 +434,23 @@ class TmuxConfig:
         """
         )
 
-    def write(self, cmd: str = "", eol: str = "\n") -> None:
+    def not_write_lines(self, lines):
+        """Writes list of lines"""
+        # : list[str | list[str]]):
+        for line in lines:
+            if isinstance(line, list):
+                for sub_line in line:
+                    self.write(sub_line)
+            else:
+                self.write(line)
+
+    # def write(self, content=""):
+    #    """Handles strings or list of strings"""
+
+    # def write(self, cmd: str | list[str | list[str]] = "", eol: str = "\n") -> None:
+    def write(
+        self, cmd: Union[str, list[str], list[list[str]]] = "", eol: str = "\n"
+    ) -> None:
         """Writes tmux cmds to config file
 
         Filters out -N "note" statements if not supported, so they can
@@ -446,34 +464,40 @@ class TmuxConfig:
             #
             return
 
-        #
-        #  Convert to lines actually to be written
-        #
-        lines: list[str] = []
-        for raw_line in cmd.split("\n"):
-            #
-            #  Returns a list of lines. If input contained a -N and notes
-            #  are not supported by this tmux, the note is extracted and
-            #  the following is returned.
-            #  self.use_notes_as_comments = True
-            #   - empty string, vertical spacer
-            #   - note as a comment
-            #   - the remainder of the initial line
-            #  self.use_notes_as_comments = False
-            #   - the remainder of the initial line
-            #
-            for line in self.filter_note(raw_line.strip()):
-                lines.append(line)
+        if isinstance(cmd, list):
+            for line in cmd:
+                self.write(line)
+
+        if isinstance(cmd, str) and cmd.find("\n") > -1:
+            for raw_line in cmd.split("\n"):
+                #
+                #  Returns a list of lines. If input contained a -N and notes
+                #  are not supported by this tmux, the note is extracted and
+                #  the following is returned.
+                #  self.use_notes_as_comments = True
+                #   - empty string, vertical spacer
+                #   - note as a comment
+                #   - the remainder of the initial line
+                #  self.use_notes_as_comments = False
+                #   - the remainder of the initial line
+                #
+                with open("/home/jaclu/tmp/tmux_conf-dbg.log", "a", encoding="utf-8") as f:
+                    f.write(f"raw_line: {raw_line}\n\n")
+
+                self.write(raw_line)
+        else:
+            with open("/home/jaclu/tmp/tmux_conf-dbg.log", "a", encoding="utf-8") as f:
+                f.write(f"other_cmd: {cmd}\n\n")
+
+        if self.use_embedded_scripts and (btick_unescaped(str(cmd))):
+            raise SyntaxError(
+                "Un-escaped back-ticks can not be present in "
+                + "the generated config when\n"
+                + "embedded_scripts are used!"
+            )
 
         with open(self.conf_file, "a", encoding="utf-8") as f:
-            for line in lines:
-                if self.use_embedded_scripts and (btick_unescaped(line)):
-                    raise SyntaxError(
-                        "Un-escaped back-ticks can not be present in "
-                        + "the generated config when\n"
-                        + "embedded_scripts are used!"
-                    )
-                f.write(f"{line}{eol}")
+            f.write(f"{cmd}{eol}")
 
     def filter_note(self, line: str):
         """Returns list of lines, if notes are not supported

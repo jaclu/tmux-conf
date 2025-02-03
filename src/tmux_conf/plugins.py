@@ -321,6 +321,16 @@ class Plugins:
                     "",
                 ]
 
+        output.append("")  # spacer between sections
+        return output
+
+    def deploy_plugin_handler(self):
+        """Adds the plugin handler (if any desired)"""
+        if not self._used_plugins:
+            return []
+
+        output = []
+
         if self._plugin_handler == "manual":
             #
             #  Setup manual plugin handling, check for each listed
@@ -335,7 +345,6 @@ class Plugins:
             #
             output.append(self.mkscript_tpm_deploy())
             output.append(self._es.run_it(self._fnc_activate_tpm, in_bg=True))
-        output.append("")  # spacer between sections
         return output
 
     def get_env(self) -> tuple[str, str]:
