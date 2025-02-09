@@ -29,8 +29,6 @@ from .exceptions import TmuxConfNotTmuxCommand
 from .plugins import Plugins
 from .utils import (
     btick_unescaped,
-    expanduser_plus,
-    is_executable,
     parse_cmdline,
     run_shell,
     verify_conf_file_usable,
@@ -112,6 +110,9 @@ class TmuxConfig:
             plugins_display = args.plugins_display
 
         self.tmux_bin = ""
+        self.e_c_has_been_called = False
+        self._write_stdout = False
+        print(f"Processing: {__main__.__file__}")
 
         #  can't use self.is_tmate() at this point, since self.tmux_bin
         #  is not yet set
@@ -128,14 +129,9 @@ class TmuxConfig:
                 #  tmate only supports manual plugin handling
                 self.plugin_handler = "manual"
 
-        self.e_c_has_been_called = False
-        self._write_stdout = False
-
-        print(f"Processing: {__main__.__file__}")
-
         self.conf_file = verify_conf_file_usable(conf_file)
 
-        self.find_tmux_bin(tmux_bin, requested_vers=tmux_version)
+        self.use_tmux_bin(tmux_bin, tmux_version)
         if tmux_version and (tmux_version != self.vers.get()):  # type: ignore
             # self.define_tmux_vers(tmux_version)
             if not self.is_tmate():
@@ -547,28 +543,22 @@ class TmuxConfig:
     #
     #  Selecting tmux bin
     #
-    def find_tmux_bin(self, cmd: str = "", requested_vers: str = "") -> None:
+    def find_tmux_bin(self, cmd: str = "tmux") -> str:
         """if tmux should use a specific version, when generating config
         set requested_vers parameter, if empty the actual version is used
         if found, will set self.tmux_bin and more
         if not Raises exception
         """
         if not cmd:
-            #  Use the first that gives something
-            cmd = self.find_cmd_1() or self.full_path_cmd() or self.find_cmd_3()
+            cmd = self.find_cmd_prev_conf()
 
         if not cmd:
-            raise TmuxConfNotTmuxCommand("No tmux command found")
-        self.expand_cmd_path(cmd, requested_vers)
-
-        # ==== 1 =
-
-        if not self.tmux_bin:
             #  tmux not found abort
             print("ERROR could not find tmux binary, aborting")
             sys.exit(1)
+        return self.full_path_cmd(cmd)
 
-    def find_cmd_1(self) -> str:
+    def find_cmd_prev_conf(self) -> str:
         """First check is to see if the tmux used to generate the
         previous config can be extracted.
         """
@@ -585,25 +575,13 @@ class TmuxConfig:
             print(f"found {cmd} in conf file")
         return cmd
 
-    def find_cmd_3(self) -> str:
-        """Finally try some likely locations"""
-        cmd = ""
-        for c in (
-            "/usr/local/bin/tmux",
-            "/home/linuxbrew/.linuxbrew/bin/tmux",
-            "~/.asdf/shims/tmux",
-        ):
-            c2 = expanduser_plus(c)
-            if is_executable(c2):
-                cmd = c2
-                print(f"found {cmd} manually")
-                break
-        return cmd
-
     def use_tmux_bin(self, tmux_bin: str = "tmux", requested_vers: str = "") -> bool:
         """Returns True if this was a valid tmux bin
         If this was the case self.tmux_bin & self.vers will have been set
         """
+        if not tmux_bin:
+            tmux_bin = self.find_tmux_bin()  # now a full path
+
         parts = run_shell(f"{tmux_bin} -V").split(" ")
         if len(parts) != 2 or parts[0] not in ("tmux", "tmate"):
             raise TmuxConfNotTmuxCommand(f"{tmux_bin} Doesn't seem to be a tmux binary")
@@ -620,44 +598,14 @@ class TmuxConfig:
     #
     #  Various attempt at finding the tmux bin
     #
-    def expand_cmd_path(self, cmd: str, requested_vers: str = "") -> None:
-        """If this is an asdf tmux, we need to translate path from shim
-        to actual bin, in order to ptoperly detect version, but make sure
-        not to expand an asdf path that has already been processed!
-
-        Any process starting in the same dir as tmux was started will
-        inherit potential local asdf tmux selection, but processes
-        starting in other dirs will use asdf default version.
-        By expanding the initial shim into a full path,
-        the correct tmux will be used in all cases.
-        """
-        if cmd:
-            #  First use what in the asdf case might be a shim, in order
-            #  to get full path
-            #
-            if not self.use_tmux_bin(cmd, requested_vers):
-                self.tmux_bin = ""
-                return
-        # get full path notation for tmux
-        cmd = self.full_path_cmd(self.tmux_bin)
-        if cmd.find(".asdf") > -1 and cmd.find("/installs/") < 0:
-            if not self.use_tmux_bin(cmd):
-                print(f"ERROR: asdf tmux does not seem to be valid: {cmd}")
-                sys.exit(1)
-            #
-            #  Convert asdf shim into absolute path
-            #
-            cmd_asdf = (
-                f'{cmd.split("shims/")[0]}installs/tmux/'
-                f'{self.vers.get().split("-", maxsplit=1)[0]}/bin/tmux'
-            )
-            self.use_tmux_bin(cmd_asdf)
-
     def full_path_cmd(self, cmd: str = "tmux") -> str:
+        # returns full path of cmd if found
         c = run_shell(f"command -v {cmd}")
-        if c and c.lower().find("not found") < 0:
-            cmd = c
-            print(f"found {cmd} in PATH")
+        if c and c.lower().find("not found") > -1:
+            raise TmuxConfNotTmuxCommand(f"Not found: {cmd}")
+        if c.find(".asdf/shims") > -1:
+            cmd = self.full_path_cmd(c)
+        print(f"found {cmd} in PATH")
         return cmd
 
     def remove_conf_file(self) -> None:
