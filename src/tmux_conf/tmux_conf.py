@@ -20,6 +20,8 @@ import datetime
 import os
 import shutil
 import sys
+from pathlib import Path
+from typing import Union
 
 import __main__
 
@@ -27,12 +29,7 @@ from .constants import __version__
 from .embedded_scripts import EmbeddedScripts
 from .exceptions import TmuxConfNotTmuxCommand
 from .plugins import Plugins
-from .utils import (
-    btick_unescaped,
-    parse_cmdline,
-    run_shell,
-    verify_conf_file_usable,
-)
+from .utils import btick_unescaped, parse_cmdline, run_shell, verify_conf_file_usable
 from .vers_check import VersionCheck
 
 
@@ -85,6 +82,8 @@ class TmuxConfig:
 
     lib_version: str = __version__
 
+    use_debug_log = False  # if True, debug log will be printed
+
     # pylint: disable=too-many-arguments,too-many-positional-arguments
     def __init__(
         self,
@@ -109,10 +108,13 @@ class TmuxConfig:
             clear_plugins = args.clear_plugins
             plugins_display = args.plugins_display
 
+        print(f"Processing: {__main__.__file__}")
         self.tmux_bin = ""
         self.e_c_has_been_called = False
-        self._write_stdout = False
-        print(f"Processing: {__main__.__file__}")
+        self._parsing_note = False  # Only enabled during parsing of bind note
+        # config file will only be written to if self.write_enable(True) has been set
+        self._write_enabled = False
+        self.init_debug_log()
 
         #  can't use self.is_tmate() at this point, since self.tmux_bin
         #  is not yet set
@@ -177,7 +179,6 @@ class TmuxConfig:
             clear_plugins=clear_plugins,
             plugins_display=plugins_display,
         )
-        self.write_enable(False)  # Allow plugin checks to run without writing to conf file
 
     # ================================================================
     #
@@ -310,8 +311,7 @@ class TmuxConfig:
         #
         self.plugins.set_limited_host(self.is_limited_host)
 
-        self._write_stdout = True  # Needs to be true during plugin init
-        self.write_enable(False)
+        self.write_enable(False)  # ensure config file is not written to during plugin scan
         if self.plugin_handler:
             self.plugins.scan(self.list_plugin_methods())
             if self.plugins_display == 3:
@@ -345,7 +345,15 @@ class TmuxConfig:
                 else:
                     self.write(line)
 
+        #
+        #  Local overrides should happen as late as possible, but still _before_
+        #  tpm is triggered, to make sure overrides get processed.
+        #
         self.local_overrides()
+
+        self.write(self.plugins.deploy_plugin_handler())
+        self.write()  # group spacer
+
         #
         #  Should be called as late as possible, to be able to have
         #  gathered all the intended embedded scripts.
@@ -363,8 +371,122 @@ class TmuxConfig:
                 plugin_mthds.append(getattr(self, item))
         return plugin_mthds
 
+    # ===============================================================
+    #
+    #   write tmux conf
+    #
+    # ===============================================================
+
     def write_enable(self, state: bool) -> None:
         self._write_enabled = state
+
+    def write(
+        self, cmd: Union[str, list[str], list[list[str]]] = "", eol: str = "\n"
+    ) -> None:
+        """Writes tmux cmds to config file
+
+        Filters out -N "note" statements if not supported, so they can
+        always be supplied, regardless of tmux version.
+
+        Can handle single and multi line commands, prints LF as a suffix.
+        """
+        if not self._write_enabled:
+            #
+            #  Plugin scans might trigger writes, at that point ignore them
+            #
+            return
+
+        if isinstance(cmd, list):
+            for line in cmd:
+                self.debug_log(f"><> [list line] {line}")
+                self.write(line)
+            return  # list has already been processed
+
+        if isinstance(cmd, str) and cmd.find("\n") > -1:
+            for multi_line in cmd.split("\n"):
+                # self.debug_log(f"><> [multi_line] {multi_line}")
+                self.write(multi_line)
+            return  # lines have already been processed
+
+        if not self._parsing_note and cmd.find("bind -N") > -1:
+            #
+            #  Returns a list of lines. If input contained a -N and notes
+            #  are not supported by this tmux, the note is extracted and
+            #  the following is returned.
+            #  self.use_notes_as_comments = True
+            #   - note as a comment
+            #   - the remainder of the initial line
+            #  self.use_notes_as_comments = False
+            #   - the remainder of the initial line
+            #
+            self._parsing_note = True  # avoid recursion
+            self.debug_log(f"><> [-N cmd] {cmd}")
+            for line in self.filter_note(cmd.strip()):
+                self.debug_log(f"><> [note filtered line] {line}")
+                self.write(line)
+            self.debug_log("><> [end of -N cmd]\n")
+            self._parsing_note = False
+            return  # lines have already been processed
+
+        if self.use_embedded_scripts and (btick_unescaped(str(cmd))):
+            raise SyntaxError(
+                "Un-escaped back-ticks can not be present in "
+                + "the generated config when\n"
+                + "embedded_scripts are used!"
+            )
+
+        # self.debug_log(f"><> [single line] {cmd}")
+        with open(self.conf_file, "a", encoding="utf-8") as f:
+            l123 = cmd.strip()
+            self.debug_log(l123)
+            f.write(f"{l123}{eol}")  # use strip to get rid of indentions
+            #  f.write(f"{cmd}{eol}")
+
+    def filter_note(self, line: str):
+        """Handles notes, if tmux notes are not supported by running tmux
+        generates:
+          - the note as a comment (if self.use_notes_as_comments is True)
+          - the actual command without the note
+        """
+
+        if (
+            not line
+            or line[0] == "#"
+            or line.find("-N") < 0
+            or (self.vers_ok("3.1") and self.use_notes_as_comments)
+        ):
+            return [line]
+        parts = line.split("-N")
+        pre = parts[0].strip()
+        post = parts[1].strip()
+        if not post:
+            # Probably an -N at end of line, so not related to a note
+            return [pre]
+        p0 = post[0]
+        if p0 in {'"', "'"}:
+            end_note = post[1:].find(p0)
+            x = end_note + 1
+            note = post[1:x]
+            y = end_note + 2
+            post = post[y:]
+        else:  # single word note
+            note_end = post.find(" ")
+            note = post.split()[0]
+            post = post[note_end:]
+
+        while post.find("   ") == 0:
+            post = post[1:]
+        new_line = pre + post
+        if self.use_notes_as_comments:
+            return [f"# -N {note}", new_line]
+
+        return [new_line]
+
+    # ===============================================================
+    #
+    #   handle tmux config file
+    #
+    # ===============================================================
 
     def conf_file_header(self) -> None:
         """Creates the conf-file header & sets a few env variables about
@@ -372,7 +494,6 @@ class TmuxConfig:
         know what to call if needed.
         """
         self.remove_conf_file()
-        self._write_stdout = False
         self.write_enable(True)
 
         print(f"Writing tmux {self.vers.get()} config to {self.conf_file}")
@@ -393,7 +514,7 @@ class TmuxConfig:
         #
         #      Creation time: {datetime.datetime.now().strftime("%y-%m-%d %H:%M:%S")}
         #          tmux-conf: {self.lib_version}
-        #         Created on: {run_shell('hostname').strip()}"""
+        #         Created on: {run_shell("hostname").strip()}"""
         )
         if self.vers.get() != self.vers.get_actual():  # type: ignore
             w(f"#     actual version: ({self.vers.get_actual()})")
@@ -428,93 +549,6 @@ class TmuxConfig:
         """
         )
 
-    def write(self, cmd: str = "", eol: str = "\n") -> None:
-        """Writes tmux cmds to config file
-
-        Filters out -N "note" statements if not supported, so they can
-        always be supplied, regardless of tmux version.
-
-        Can handle single and multi line commands, prints LF as a suffix.
-        """
-        if not self._write_enabled:
-            #
-            #  Plugin scans might trigger writes, at that point ignore them
-            #
-            return
-
-        #
-        #  Convert to lines actually to be written
-        #
-        lines: list[str] = []
-        for raw_line in cmd.split("\n"):
-            #
-            #  Returns a list of lines. If input contained a -N and notes
-            #  are not supported by this tmux, the note is extracted and
-            #  the following is returned.
-            #  self.use_notes_as_comments = True
-            #   - empty string, vertical spacer
-            #   - note as a comment
-            #   - the remainder of the initial line
-            #  self.use_notes_as_comments = False
-            #   - the remainder of the initial line
-            #
-            for line in self.filter_note(raw_line.strip()):
-                lines.append(line)
-
-        with open(self.conf_file, "a", encoding="utf-8") as f:
-            for line in lines:
-                if self.use_embedded_scripts and (btick_unescaped(line)):
-                    raise SyntaxError(
-                        "Un-escaped back-ticks can not be present in "
-                        + "the generated config when\n"
-                        + "embedded_scripts are used!"
-                    )
-                f.write(f"{line}{eol}")
-
-    def filter_note(self, line: str):
-        """Returns list of lines, if notes are not supported
-        first an empty spacer line, then the note as a comment,
-        and finally the actual command without the note
-        if self.use_notes_as_comments is False
-        only the third line from above is returned
-        """
-
-        if (
-            not line
-            or line[0] == "#"
-            or line.find("-N") < 0
-            or (self.vers_ok("3.1") and self.use_notes_as_comments)
-        ):
-            return [line]
-        parts = line.split("-N")
-        pre = parts[0].strip()
-        post = parts[1].strip()
-        if not post:
-            # Probably an -N at end of line, so not related to a note
-            return [pre]
-        p0 = post[0]
-        if p0 in {'"', "'"}:
-            end_note = post[1:].find(p0)
-            x = end_note + 1
-            note = post[1:x]
-            y = end_note + 2
-            post = post[y:]
-        else:  # single word note
-            note_end = post.find(" ")
-            note = post.split()[0]
-            post = post[note_end:]
-
-        while post.find("   ") == 0:
-            post = post[1:]
-        new_line = pre + post
-        if self.use_notes_as_comments:
-            return ["", f"#  {note}", new_line]
-
-        return [new_line]
-
-    #
-    #  Should conf file be replaced?
-    #
     def verify_replace(self) -> None:
         """Get verification that a config should be over-written
         the param replace_config=True skips this check
@@ -540,9 +574,17 @@ class TmuxConfig:
             print("Terminating...")
             sys.exit(1)
 
+    def remove_conf_file(self) -> None:
+        if os.path.exists(self.conf_file):
+            #  Ensure we start with an empty file
+            os.remove(self.conf_file)
+
+    # ===============================================================
     #
-    #  Selecting tmux bin
+    #   identify tmux bin
     #
+    # ===============================================================
+
     def find_tmux_bin(self, cmd: str = "tmux") -> str:
         """if tmux should use a specific version, when generating config
         set requested_vers parameter, if empty the actual version is used
@@ -584,6 +626,7 @@ class TmuxConfig:
 
         parts = run_shell(f"{tmux_bin} -V").split(" ")
         if len(parts) != 2 or parts[0] not in ("tmux", "tmate"):
+            self.debug_log(f"><> [error] {tmux_bin} Doesn't seem to be a tmux binary")
             raise TmuxConfNotTmuxCommand(f"{tmux_bin} Doesn't seem to be a tmux binary")
 
         vers = VersionCheck(actual_vers=parts[1], requested_vers=requested_vers)
@@ -595,9 +638,6 @@ class TmuxConfig:
         self.vers = vers
         return True
 
-    #
-    #  Various attempt at finding the tmux bin
-    #
     def full_path_cmd(self, cmd: str = "tmux") -> str:
         # returns full path of cmd if found
         c = run_shell(f"command -v {cmd}")
@@ -608,10 +648,29 @@ class TmuxConfig:
         print(f"found {cmd} in PATH")
         return cmd
 
-    def remove_conf_file(self) -> None:
-        if os.path.exists(self.conf_file):
-            #  Ensure we start with an empty file
-            os.remove(self.conf_file)
-
     def is_tmate(self) -> bool:
         return self.tmux_bin.find("tmate") > -1
+
+    # ===============================================================
+    #
+    #   debug
+    #
+    # ===============================================================
+    def init_debug_log(self):
+        if not self.use_debug_log:
+            return
+
+        d_base = os.getenv("HOME") or os.getenv("TMPDIR")
+        if d_base:
+            self.debug_log_file = Path(d_base + "/tmux_conf-dbg.log")
+        else:
+            # Failed to find a base dir
+            self.use_debug_log = False
+            return
+        if self.debug_log_file.exists():
+            self.debug_log_file.unlink()
+
+    def debug_log(self, msg):
+        if self.use_debug_log:
+            with open(self.debug_log_file, "a", encoding="utf-8") as f:
+                f.write(f"{msg}\n")

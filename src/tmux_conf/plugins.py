@@ -89,7 +89,7 @@ class Plugins:
         self._skipped_plugins: list[tuple[str, str]] = []
 
         self._fnc_activate_tpm = "activate_tpm"
-        self._fnc_activate_manually = "activate_plugins_mamually"
+        self._fnc_activate_manually = "activate_plugins_manually"
 
         if plugins_display not in [0, 1, 2, 3]:
             raise ValueError("plugins_display must be one of: 0, 1, 2, 3")
@@ -192,7 +192,7 @@ class Plugins:
 
         if self._used_plugins:
             print("\n\t-----   Plugins used   -----")
-            print(f'{"Plugin":<{max_l_name}}|  Min version')
+            print(f"{'Plugin':<{max_l_name}}|  Min version")
 
         #
         #  Create list of items in plugins dir
@@ -221,8 +221,7 @@ class Plugins:
                 )
                 print("".ljust(len(inner_name) + 2, "-"))
                 print(
-                    f"> {inner_name:<{max_l_name - 2}} - "
-                    f"{info[PLUGIN_VERS_MIN]} {suffix}"
+                    f"> {inner_name:<{max_l_name - 2}} - {info[PLUGIN_VERS_MIN]} {suffix}"
                 )
                 info[1]()  # PLUGIN_MTHD
                 #
@@ -263,8 +262,8 @@ class Plugins:
         for vers, name in self._skipped_plugins:
             max_l_v = max(max_l_v, len(vers))
         print("-----   Plugins ignored   -----")
-        print(f'{"Min":<{max_l_v}}|{" Plugin name":<{max_l_name}}')
-        print(f'{"vers":<{max_l_v}}|\n')
+        print(f"{'Min':<{max_l_v}}|{' Plugin name':<{max_l_name}}")
+        print(f"{'vers':<{max_l_v}}|\n")
         for vers, name in self._skipped_plugins:
             print(f"{vers:>{max_l_v}}  {name:<{max_l_name}}")
 
@@ -313,13 +312,23 @@ class Plugins:
             else:
                 #  prior to 1.8, any variables starting wiith @ would get tmux
                 #  stuck parsing the config file, so plugins without any such
-                #  setting could be handled by activate_plugins_mamually()
+                #  setting could be handled by activate_plugins_manually()
                 #  This is such a rare edge case that it is not worh handling
                 output += [
                     f"# plugin: {name}",
                     "# in versions < 1.8 @variables can not be used",
                     "",
                 ]
+
+        # output.append("")  # spacer between sections
+        return output
+
+    def deploy_plugin_handler(self):
+        """Adds the plugin handler (if any desired)"""
+        if not self._used_plugins:
+            return []
+
+        output = []
 
         if self._plugin_handler == "manual":
             #
@@ -335,7 +344,6 @@ class Plugins:
             #
             output.append(self.mkscript_tpm_deploy())
             output.append(self._es.run_it(self._fnc_activate_tpm, in_bg=True))
-        output.append("")  # spacer between sections
         return output
 
     def get_env(self) -> tuple[str, str]:
