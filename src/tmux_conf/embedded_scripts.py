@@ -106,7 +106,7 @@ class EmbeddedScripts:
             cmd += "-b "
         cmd += '"'
         if self._use_embedded_scripts:
-            cmd += f"cut -c3- {self._conf_file} | "
+            cmd += f"cut -c3- '{os.path.expanduser(self._conf_file)}' | "
             if scr_name in self._bash_scripts:
                 if not self._bash_shell:
                     bash_shell = run_shell("command -v bash")

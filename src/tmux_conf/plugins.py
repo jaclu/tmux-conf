@@ -367,7 +367,7 @@ class Plugins:
                 conf_base = os.path.dirname(location)
 
             plugins_dir = os.path.join(conf_base, "tmux", "plugins")
-            tpm_env = os.path.expanduser(f'XDG_CONFIG_HOME="{conf_base}" ')
+            tpm_env = f"{os.path.expanduser(conf_base)}"
 
         return plugins_dir, tpm_env
 
@@ -444,7 +444,8 @@ class Plugins:
         """
         )
         #  os.makedirs(plugins_dir, exist_ok=True)
-        plugins_dir, tpm_env = self.get_env()
+        # plugins_dir, tpm_env = self.get_env()
+        plugins_dir, _ = self.get_env()
         tpm_location = os.path.join(plugins_dir, "tpm")
         tpm_app = os.path.join(tpm_location, "tpm")
         activate_tpm_sh = [
@@ -454,7 +455,7 @@ class Plugins:
     #  Initialize already installed tpm if found
     #
     if [ -x "{tpm_app}" ]; then
-        {tpm_env}{tpm_app}
+        "{tpm_app}"
         exit 0
     fi
 
@@ -473,7 +474,7 @@ class Plugins:
     fi
 
     $TMUX_BIN display "Running cloned tpm..."
-    {tpm_env}"{tpm_app}"
+    "{tpm_app}"
     if [ "$?" -ne 0 ]; then
         echo "Failed to run: {tpm_app}"
         exit 12
@@ -485,7 +486,7 @@ class Plugins:
     #  Default trigger is: <prefix> I
     #
     $TMUX_BIN display "Installing all plugins..."
-    {tpm_env}"{tpm_location}/bindings/install_plugins"
+    "{tpm_location}/bindings/install_plugins"
     if [ "$?" -ne 0 ]; then
         echo "Failed to run: {tpm_location}/bindings/install_plugins"
         exit 12
