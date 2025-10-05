@@ -336,7 +336,7 @@ class TmuxConfig:
             #
             #   Plugins
             #
-            # ======================================================\n"""
+            #======================================================\n"""
             )
             for line in self.plugins.parse():
                 if isinstance(line, list):
