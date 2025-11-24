@@ -332,7 +332,8 @@ class TmuxConfig:
         self.edit_config()
         if self.plugin_handler and self.plugins.installed():
             w(
-                """#======================================================
+                """
+            #======================================================
             #
             #   Plugins
             #
@@ -381,7 +382,10 @@ class TmuxConfig:
         self._write_enabled = state
 
     def write(
-        self, cmd: Union[str, list[str], list[list[str]]] = "", eol: str = "\n"
+        self,
+        cmd: Union[str, list[str], list[list[str]]] = "",
+        trim_ws: bool = True,  # trim leading white-space
+        eol: str = "\n",
     ) -> None:
         """Writes tmux cmds to config file
 
@@ -399,13 +403,13 @@ class TmuxConfig:
         if isinstance(cmd, list):
             for line in cmd:
                 self.debug_log(f"><> [list line] {line}")
-                self.write(line)
+                self.write(line, trim_ws)
             return  # list has already been processed
 
         if isinstance(cmd, str) and cmd.find("\n") > -1:
             for multi_line in cmd.split("\n"):
                 # self.debug_log(f"><> [multi_line] {multi_line}")
-                self.write(multi_line)
+                self.write(multi_line, trim_ws)
             return  # lines have already been processed
 
         if not self._parsing_note and cmd.find("bind -N") > -1:
@@ -421,9 +425,10 @@ class TmuxConfig:
             #
             self._parsing_note = True  # avoid recursion
             self.debug_log(f"><> [-N cmd] {cmd}")
-            for line in self.filter_note(cmd.strip()):
+            # for line in self.filter_note(cmd.strip()):
+            for line in self.filter_note(cmd, trim_ws=trim_ws):
                 self.debug_log(f"><> [note filtered line] {line}")
-                self.write(line)
+                self.write(line, trim_ws)
             self.debug_log("><> [end of -N cmd]\n")
             self._parsing_note = False
             return  # lines have already been processed
@@ -437,12 +442,15 @@ class TmuxConfig:
 
         # self.debug_log(f"><> [single line] {cmd}")
         with open(self.conf_file, "a", encoding="utf-8") as f:
-            l123 = cmd.strip()
-            self.debug_log(l123)
-            f.write(f"{l123}{eol}")  # use strip to get rid of indentions
-            #  f.write(f"{cmd}{eol}")
+            if trim_ws:
+                l123 = cmd.strip()
+                self.debug_log(l123)
+                f.write(f"{l123}{eol}")  # use strip to get rid of indentions
+                #  f.write(f"{cmd}{eol}")
+            else:
+                f.write(f"{cmd}{eol}")
 
-    def filter_note(self, line: str):
+    def filter_note(self, line: str, trim_ws: bool = True):
         """Handles notes, if tmux notes are not supported by running tmux
         generates:
           - the note as a comment (if self.use_notes_as_comments is True)
@@ -457,7 +465,10 @@ class TmuxConfig:
         ):
             return [line]
         parts = line.split("-N")
-        pre = parts[0].strip()
+        if trim_ws:
+            pre = parts[0].strip()
+        else:
+            pre = parts[0]
         post = parts[1].strip()
         if not post:
             # Probably an -N at end of line, so not related to a note
@@ -478,7 +489,7 @@ class TmuxConfig:
             post = post[1:]
         new_line = pre + post
         if self.use_notes_as_comments:
-            return [f"# -N {note}", new_line]
+            return ["", f"# -N {note}", new_line]
 
         return [new_line]
 
@@ -617,7 +628,7 @@ class TmuxConfig:
             print(f"found {cmd} in conf file")
         return cmd
 
-    def use_tmux_bin(self, tmux_bin: str = "tmux", requested_vers: str = "") -> bool:
+    def use_tmux_bin(self, tmux_bin: str = "tmux", vers_requested: str = "") -> bool:
         """Returns True if this was a valid tmux bin
         If this was the case self.tmux_bin & self.vers will have been set
         """
@@ -629,7 +640,7 @@ class TmuxConfig:
             self.debug_log(f"><> [error] {tmux_bin} Doesn't seem to be a tmux binary")
             raise TmuxConfNotTmuxCommand(f"{tmux_bin} Doesn't seem to be a tmux binary")
 
-        vers = VersionCheck(actual_vers=parts[1], requested_vers=requested_vers)
+        vers = VersionCheck(vers_detected=parts[1], vers_requested=vers_requested)
         # except TmuxConfInvalidTmuxVersion:
         #     print("{parts[[1]} Doesn't seem to be a valid tmux version")
         #     return False
