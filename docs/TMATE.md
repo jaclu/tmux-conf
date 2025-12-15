@@ -46,8 +46,8 @@ this plugin is used without a tmux-conf generated config.
 Here are some plugins that work with tmate, in some cases I have adopted
 them, with TMUX_BIN notation, then listing my fork.
 
-plugin | fork
+plugin|fork
 -|-
-jaclu/tmux-keyboard-type| not a fork
-NHDaly/tmux-better-mouse-mode | jaclu/tmux-better-mouse-mode
-tmux-plugins/tmux-prefix-highlight  | jaclu/tmux-prefix-highlight
+jaclu/tmux-keyboard-type|not a fork
+NHDaly/tmux-better-mouse-mode|jaclu/tmux-better-mouse-mode
+tmux-plugins/tmux-prefix-highlight|jaclu/tmux-prefix-highlight
