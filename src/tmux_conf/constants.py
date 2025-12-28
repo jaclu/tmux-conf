@@ -10,6 +10,6 @@
 
 """packet wide constants"""
 
-__version__ = "0.22.0"
+__version__ = "0.22.1"
 
 XDG_CONFIG_HOME = "XDG_CONFIG_HOME"
