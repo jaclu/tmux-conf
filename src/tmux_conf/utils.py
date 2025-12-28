@@ -48,7 +48,7 @@ def is_executable(cmd: str) -> bool:
     return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
 
 
-def parse_cmdline(args):
+def parse_cmdline(args: list[str]) -> argparse.Namespace:
     """Parse command line options"""
 
     parser = argparse.ArgumentParser(

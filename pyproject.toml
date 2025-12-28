@@ -1,10 +1,10 @@
 [project]
 name = "tmux_conf"
-version = "0.21.2"
+version = "0.22.0"
 authors = [{ name = "Jacob Lundqvist", email = "Jacob.Lundqvist@gmail.com" }]
 description = "Generates version checked tmux conf"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.10"
 keywords = ["tmux", "automation"]
 
 classifiers = [
@@ -15,28 +15,9 @@ classifiers = [
 
 [project.urls]
 Homepage = "https://github.com/jaclu/tmux-conf"
-documentation = "https://github.com/jaclu/tmux-conf"
-repository = "https://github.com/jaclu/tmux-conf"
+Documentation = "https://github.com/jaclu/tmux-conf"
+Repository = "https://github.com/jaclu/tmux-conf"
 "Bug Tracker" = "https://github.com/jaclu/tmux-conf/issues"
-
-# [tool.poetry]
-# name = "tmux_conf"
-# version = "0.1.0"
-# description = "Your description here"
-# authors = ["Your Name <your.email@example.com>"]
-
-# [tool.poetry.dependencies]
-# python = "^3.9"
-
-# [tool.poetry.dev-dependencies]
-# pytest = "^6.2"
-# mypy = "^0.910"
-# flake8 = "^3.9"
-# isort = "^5.9"
-# black = "^21.6"
-
-# [tool.poetry.scripts]
-# tmux-conf = 'tmux_conf.__main__:main'
 
 [build-system]
 requires = ["setuptools>=42", "wheel"]
@@ -46,11 +27,10 @@ build-backend = "setuptools.build_meta"
 line-length = 92
 include = '\.pyi?$'
 exclude = '''
-
 (
   /(
-      \.eggs         # exclude a few common directories in the
-    | \.git          # root of the project
+      \.eggs
+    | \.git
     | \.hg
     | \.mypy_cache
     | \.tox
@@ -61,20 +41,18 @@ exclude = '''
     | dist
     | test
   )/
-  | foo.py           # also separately exclude a file named foo.py in
-                     # the root of the project
 )
 '''
 
-[tool.flake8]
-max-line-length = 92
-extend-ignore = "E203, W503"
+# [tool.flake8]
 
 [tool.isort]
 profile = "black"
+line_length = 92
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.10"
+exclude = "^tests/"
 mypy_path = "src"
 check_untyped_defs = true
 disallow_any_generics = true
@@ -83,25 +61,15 @@ no_implicit_optional = true
 show_error_codes = true
 strict_equality = true
 strict_optional = true
-
 warn_redundant_casts = true
 warn_return_any = true
-
 warn_unreachable = true
 warn_unused_configs = true
 no_implicit_reexport = true
 
 [tool.pymarkdown]
-# plugins.no-inline-html.enabled = false
-#plugins.line-length.enabled = false
-# plugins.line-length.line_length = 92
 plugins.line-length.code_block_line_length = 92
-#plugins.md033.allowed_elements = "nbsp,prefix"
 
-[tool.pytest]
+[tool.pytest.ini_options]
 addopts = "-ra -q --strict"
 python_files = ["tests/test_*.py"]
-
-[py.typed]
-# This file indicates that the package includes type information (PEP 561).
-# It is typically an empty file, but its presence signifies the package supports type checking.

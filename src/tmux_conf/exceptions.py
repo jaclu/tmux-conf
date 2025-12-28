@@ -13,7 +13,7 @@
 class TmuxConfNotTmuxCommand(Exception):
     """Command does not seem to be tmux"""
 
-    def __init__(self, message="Invalid tmux command"):
+    def __init__(self, message: str = "Invalid tmux command") -> None:
         self.message = message
         super().__init__(self.message)
 
@@ -21,6 +21,6 @@ class TmuxConfNotTmuxCommand(Exception):
 class TmuxConfInvalidTmuxVersion(Exception):
     """Version is not valid tmux version"""
 
-    def __init__(self, message="Invalid tmux version string"):
+    def __init__(self, message: str = "Invalid tmux version string") -> None:
         self.message = message
         super().__init__(self.message)

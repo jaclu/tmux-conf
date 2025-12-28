@@ -2,6 +2,7 @@ import os
 import shutil
 
 import pytest
+
 from src.tmux_conf import TmuxConfig
 from src.tmux_conf.exceptions import TmuxConfNotTmuxCommand
 from src.tmux_conf.utils import run_shell
@@ -84,9 +85,7 @@ def tc_env(conf_file=CONF_FILE):
 
 
 def prep_plugin_class(cls, version="2.8", plugins_display=0):
-    t = tmux_conf_instance(
-        cls=cls, tmux_version=version, plugins_display=plugins_display
-    )
+    t = tmux_conf_instance(cls=cls, tmux_version=version, plugins_display=plugins_display)
     # ps = cls(parse_cmd_line=False, conf_file=CONF_FILE, tmux_version=version)
     t.plugins.scan(t.list_plugin_methods())
     return t
@@ -232,8 +231,7 @@ def not_test_tc_conf_file_create_default(capfd):
     out, _ = capfd.readouterr()
     if os.path.exists(tmp_conf_file):
         shutil.move(tmp_conf_file, def_conf_file)
-    assert out.find(
-        "Do you wish to create a default config file (y/n)?") > -1
+    assert out.find("Do you wish to create a default config file (y/n)?") > -1
 
 
 def not_test_tc_conf_file_no_write(capfd):

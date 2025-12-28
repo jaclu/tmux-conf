@@ -57,15 +57,15 @@ class VersionCheck:
             raise ValueError from exc
         self.v_min, self.v_suffix = self.get_sub_vers(v_min)
 
-    def get(self):
+    def get(self) -> str:
         """The version used for generating the config"""
         return self._vers
 
-    def get_actual(self):
+    def get_actual(self) -> str:
         """The version of the tmux bin"""
         return self._vers_actual
 
-    def is_ok(self, vers) -> bool:
+    def is_ok(self, vers: int | float | str) -> bool:
         """Checks version vs current tmux environment
         Param is forgiving, can be int, float or string.
         When given as int .0 is appended
@@ -96,7 +96,7 @@ class VersionCheck:
             r = False
         return r
 
-    def get_sub_vers(self, v2: str):
+    def get_sub_vers(self, v2: str) -> tuple[int, str]:
         """get sub version"""
 
         int_part = ""
@@ -112,7 +112,7 @@ class VersionCheck:
         s = v2.split(int_part)[1]
         return i, s
 
-    def normalize_vers(self, vers) -> str:
+    def normalize_vers(self, vers: int | float | str) -> str:
         """Normalizes vers into a string"""
 
         if isinstance(vers, str) and vers.find(".") < 0:

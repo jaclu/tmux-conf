@@ -11,9 +11,7 @@ SCRIPT_NAME = "foo123"
 
 
 def es_env(conf_file=CONF_FILE, use_embedded_scripts=True):
-    return EmbeddedScripts(
-        conf_file=conf_file, use_embedded_scripts=use_embedded_scripts
-    )
+    return EmbeddedScripts(conf_file=conf_file, use_embedded_scripts=use_embedded_scripts)
 
 
 def es_hello_world(conf_file=CONF_FILE, use_embedded_scripts=True, use_bash=False):
