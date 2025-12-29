@@ -1,0 +1,5 @@
+{
+    "exclude": ["tests", ".venv"],
+    "reportMissingImports": true,
+    "reportUnusedVariable": true
+}
