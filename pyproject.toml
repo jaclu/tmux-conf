@@ -70,6 +70,11 @@ no_implicit_reexport = true
 [tool.pymarkdown]
 plugins.line-length.code_block_line_length = 92
 
+[tool.pyright]
+exclude = [ "tests" ]
+# reportMissingImports = false
+# reportMissingTypeStubs = false
+
 [tool.pytest.ini_options]
 addopts = "-ra -q --strict"
 python_files = ["tests/test_*.py"]
