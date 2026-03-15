@@ -212,15 +212,13 @@ class TmuxConfig:
         any configuration overrides defined by parent classes before applying
         additional customizations.
         """
-        self.write(
-            """
+        self.write("""
         #======================================================
         #
         #   Local overrides
         #
         #======================================================
-        """
-        )
+        """)
 
     # ================================================================
     #
@@ -250,8 +248,7 @@ class TmuxConfig:
         self.e_c_has_been_called = True
 
         w = self.write
-        w(
-            f"""
+        w(f"""
 
         # ======================================================
         #
@@ -267,8 +264,7 @@ class TmuxConfig:
         #  tmux is being regenerated, and finally sourced.
         #
         # ======================================================
-        """
-        )
+        """)
 
         #
         #  For now we trust the right python to be found in path
@@ -332,14 +328,12 @@ class TmuxConfig:
         #
         self.edit_config()
         if self.plugin_handler and self.plugins.installed():
-            w(
-                """
+            w("""
             #======================================================
             #
             #   Plugins
             #
-            #======================================================\n"""
-            )
+            #======================================================\n""")
             for line in self.plugins.parse():
                 self.write(line)
 
@@ -510,27 +504,22 @@ class TmuxConfig:
 
         w = self.write
         if self.use_embedded_scripts:
-            w(
-                """# : << EMBEDDED-SCRIPTS-STARTING-POINT
+            w("""# : << EMBEDDED-SCRIPTS-STARTING-POINT
             #
             # The above line tells embedded scripts where they start
-            # further down in this file"""
-            )
+            # further down in this file""")
 
-        w(
-            f"""#
+        w(f"""#
         #  This config was created using
         #      https://github.com/jaclu/tmux-conf
         #
         #      Creation time: {datetime.datetime.now().strftime("%y-%m-%d %H:%M:%S")}
         #          tmux-conf: {self.lib_version}
-        #         Created on: {run_shell("hostname").strip()}"""
-        )
+        #         Created on: {run_shell("hostname").strip()}""")
         if self.vers.get() != self.vers.get_actual():
             w(f"#     actual version: ({self.vers.get_actual()})")
         w(f"#   For tmux version: {self.vers.get()}")
-        w(
-            f"""#
+        w(f"""#
         #
         #  Three env variables defining this instance of tmux:
         #
@@ -556,8 +545,7 @@ class TmuxConfig:
         #  This .conf file will frequently be over-written!
         #
         TMUX_SOURCE="{__main__.__file__}"
-        """
-        )
+        """)
 
     def verify_replace(self) -> None:
         """Get verification that a config should be over-written

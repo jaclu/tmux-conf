@@ -47,8 +47,7 @@ class ViNav(TmuxConfig):
         if "tmux-prefix-highlight" in self.plugins.installed():
             w("set -g  status-right '#{prefix_highlight}'")
 
-        w(
-            """
+        w("""
         # Pane navigate
         bind  -r h  select-pane -L
         bind  -r j  select-pane -D
@@ -66,8 +65,7 @@ class ViNav(TmuxConfig):
         bind -r  J  resize-pane -D
         bind -r  K  resize-pane -U
         bind -r  L  resize-pane -R
-        """
-        )
+        """)
 
     def plugin_yank(self):
         """Uses plugin tmux-plugins/tmux-yank"""

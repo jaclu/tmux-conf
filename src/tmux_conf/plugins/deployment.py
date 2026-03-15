@@ -127,15 +127,13 @@ class PluginDeployment:
         each plugin.
         """
         output = []
-        output.append(
-            """
+        output.append("""
         #======================================================
         #
         #   Manual Plugin Handling
         #
         #======================================================
-        """
-        )
+        """)
         plugins_dir, _ = self._registry.get_env()
         plugins = ""
         for p in self._registry.installed(short_name=False):
@@ -185,15 +183,13 @@ class PluginDeployment:
         defined plugins.
         """
         output = []
-        output.append(
-            """
+        output.append("""
         #======================================================
         #
         #   Tmux Plugin Manager
         #
         #======================================================
-        """
-        )
+        """)
         plugins_dir, _ = self._registry.get_env()
         tpm_location = os.path.join(plugins_dir, "tpm")
         tpm_app = os.path.join(tpm_location, "tpm")

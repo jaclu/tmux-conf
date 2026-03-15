@@ -16,16 +16,14 @@ def es_env(conf_file=CONF_FILE, use_embedded_scripts=True):
 
 def es_hello_world(conf_file=CONF_FILE, use_embedded_scripts=True, use_bash=False):
     es = es_env(conf_file=conf_file, use_embedded_scripts=use_embedded_scripts)
-    sh = [
-        f"""
+    sh = [f"""
 {SCRIPT_NAME}() {{
 
     echo "Hello world"
 
 }}
 
-"""
-    ]
+"""]
     sh.append("")
     es.create(SCRIPT_NAME, sh, use_bash=use_bash)
     return es
