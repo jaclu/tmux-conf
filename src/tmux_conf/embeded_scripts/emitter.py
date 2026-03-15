@@ -118,7 +118,7 @@ class ScriptEmitter:
 
         conf_file = os.path.expanduser(self._builder.cfg.conf_file)
 
-        xdg = os.environ.get("XDG_CONFIG_HOME")
+        xdg = os.getenv("XDG_CONFIG_HOME")
         if xdg:
             base = xdg
         else:

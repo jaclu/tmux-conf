@@ -115,7 +115,7 @@ class PluginRegistry:
                 plugins_dir = os.path.expanduser("~/.tmux/plugins")
                 tpm_env = ""
         else:
-            xdg_home = os.environ.get(XDG_CONFIG_HOME)
+            xdg_home = os.getenv(XDG_CONFIG_HOME)
             if xdg_home:
                 conf_base = os.path.expanduser(xdg_home)
             else:
